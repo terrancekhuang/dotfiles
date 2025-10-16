@@ -1,0 +1,32 @@
+return {
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      indent = { enable = true },
+      highlight = { enable = true },
+      folds = { enable = true },
+      ensure_installed = {
+        "bash",
+        "c",
+        "diff",
+        "html",
+        "javascript",
+        "jsdoc",
+        "json",
+        "lua",
+        "luadoc",
+        "luap",
+        "markdown",
+        "markdown_inline",
+        "printf",
+        "python",
+        "query",
+        "regex",
+        "tsx",
+        "typescript",
+        "vim",
+        "vimdoc",
+      },
+    },
+  },
+}
