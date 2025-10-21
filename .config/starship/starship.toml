@@ -71,7 +71,6 @@ $php\
 $crystal\
 $custom\
 $status\
-$os\
 $time"""
 
 continuation_prompt = '▶▶ '
