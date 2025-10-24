@@ -37,6 +37,9 @@ alias .5='cd ../../../../..'
 
 # don't do anything stupid
 alias rm='rm -i'
+
+alias cat='bat'
+
 #  This is your file 
 # Add your configurations here
 export EDITOR=nvim
