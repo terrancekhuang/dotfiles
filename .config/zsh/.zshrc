@@ -35,6 +35,8 @@ alias .5='cd ../../../../..'
 # # Always mkdir a path (this doesn't inhibit functionality to make a single dir)
 # alias mkdir='mkdir -p'
 
+# don't do anything stupid
+alias rm='rm -i'
 #  This is your file 
 # Add your configurations here
 export EDITOR=nvim
