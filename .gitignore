@@ -2,3 +2,4 @@
 .config/nvim/lazyvim.json
 .config/zsh/.zsh_history
 .gitconfig
+.local/bin/.bible-config

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="${SCRIPT_DIR}/.bible-config"
+
+if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
+else
+    echo "Error: Config file not found at $CONFIG_FILE"
+    echo "Create it with: echo 'ESV_API_TOKEN=\"your-token\"' > $CONFIG_FILE"
+    exit 1
+fi
+
+fetch_verse() {
+    local verse="$1"
+    local encoded_verse=${verse// /+}
+
+    response=$(curl -s -H "Authorization: Token $ESV_API_TOKEN" "https://api.esv.org/v3/passage/text/?q=$encoded_verse")
+    if [ -n "$response" ]; then
+        echo "$response" | jq -r ".passages[]?" | while IFS= read -r passage; do
+            echo -e "$passage"
+        done
+        echo ""
+    else
+        echo "Error fetching: $verse"
+        echo ""
+    fi
+}
+
+if [ -p /dev/stdin ]; then
+    while IFS= read -r line; do
+        [ -n "$line" ] && fetch_verse "$line"
+    done
+elif [ $# -gt 0 ]; then
+    fetch_verse "$1"
+else
+    echo "Usage: $0 \"John 3:16\""
+    echo "  or: cat verses.txt | $0"
+    echo "  or: echo \"John 3:16\" | $0 "
+    exit 1
+fi
