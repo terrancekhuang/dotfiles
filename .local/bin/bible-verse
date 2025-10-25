@@ -121,6 +121,48 @@ fetch_verse() {
     fi
 }
 
+show_help() {
+    echo "ESV Bible Verse Fetcher"
+    echo ""
+    echo "Usage: $0 [OPTIONS] [\"verse reference\"]"
+    echo ""
+    echo "Options:"
+    echo "  -h    Show this help message"
+    echo "  -c    Show config file location"
+    echo "  -e    Edit config file"
+    echo ""
+    echo "Examples:"
+    echo "  $0 \"John 3:16\""
+    echo "  $0 \"John 3:16; Romans 8:28\""
+    echo "  cat verses.txt | $0"
+    echo "  echo \"John 3:16\" | $0"
+    echo ""
+    echo "Config file: $CONFIG_FILE"
+}
+
+while getopts "hce" opt; do
+    case $opt in
+    h)
+        show_help
+        exit 0
+        ;;
+    c)
+        echo "Config file location: $CONFIG_FILE"
+        exit 0
+        ;;
+    e)
+        ${EDITOR:-vim} "$CONFIG_FILE"
+        exit 0
+        ;;
+    \?)
+        echo "Invalid option: -$OPTARG" >&2
+        exit 1
+        ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+
 if [ -p /dev/stdin ]; then
     while IFS= read -r line; do
         [ -n "$line" ] && fetch_verse "$line"
