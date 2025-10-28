@@ -13,3 +13,4 @@ vim.keymap.set("v", "J", "mzJ`z", opts)
 
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
 vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', opts)
+vim.keymap.set({ "n", "v" }, "<leader>P", '"+P', opts)
