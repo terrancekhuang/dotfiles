@@ -160,7 +160,7 @@
 		],
 		"min-length": 8,
 		"max-length": 8,
-		"tooltip-format": "Temp in Fahrenheit: {temperatureF}°F"
+		"tooltip": false
 	},
 
 	"memory": {
