@@ -1,12 +1,12 @@
 {
 	"clock#time": {
 		// "interval":
-		"format": "{:%H:%M}",
+		"format": "{:%H:%M:%S}",
 		// "timezone":
 		// "timezones":
 		// "locale":
-		"min-length": 5,
-		"max-length": 5,
+		"min-length": 8,
+		"max-length": 8,
 		// "rotate": 0,
 		// "on-click":
 		// "on-click-middle":
