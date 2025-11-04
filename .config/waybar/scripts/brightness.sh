@@ -6,7 +6,8 @@
 STEP=10
 BUS="2" # Your monitor is on /dev/i2c-2
 CACHE_FILE="/tmp/brightness_cache"
-CACHE_TIMEOUT=2 # seconds
+CACHE_TIMEOUT=2  # seconds
+SLEEP_MULT="0.1" # Sleep multiplier for faster DDC operations
 
 get_brightness() {
     # Check if cache is fresh (ddcutil can be slow)
@@ -20,7 +21,7 @@ get_brightness() {
 
     # Get brightness from monitor and cache it
     local brightness
-    brightness=$(ddcutil --bus "$BUS" getvcp 10 2>/dev/null | grep -oP 'current value =\s*\K\d+' || echo "50")
+    brightness=$(ddcutil --bus "$BUS" --sleep-multiplier "$SLEEP_MULT" getvcp 10 2>/dev/null | grep -oP 'current value =\s*\K\d+' || echo "50")
     echo "$brightness" >"$CACHE_FILE"
     echo "$brightness"
 }
