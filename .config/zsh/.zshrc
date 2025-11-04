@@ -70,10 +70,12 @@ alias rm='rm -i'                                            # don't do anything 
 # ============================================================================
 alias vc='code'                                             # VS Code
 
-# VLC with no terminal output
-vlc() {
-    /usr/bin/vlc "$@" &>/dev/null & disown
-}
+# Open apps detached
+vlc() { command vlc "$@" &>/dev/null & disown }
+zathura() { command zathura "$@" &>/dev/null & disown }
+libreoffice() { command libreoffice "$@" &>/dev/null & disown }
+loupe() { command loupe "$@" &>/dev/null & disown }
+darktable() { command darktable "$@" &>/dev/null & disown }
 
 # ============================================================================
 # Clipboard Management
