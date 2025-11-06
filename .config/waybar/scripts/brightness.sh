@@ -6,8 +6,9 @@
 STEP=10
 BUS="2" # Your monitor is on /dev/i2c-2
 CACHE_FILE="/tmp/brightness_cache"
-CACHE_TIMEOUT=2  # seconds
-SLEEP_MULT="0.1" # Sleep multiplier for faster DDC operations
+CACHE_TIMEOUT=2                   # seconds
+SAVE_FILE="/tmp/brightness_saved" # For idle dim/restore
+SLEEP_MULT="0.1"                  # Sleep multiplier for faster DDC operations
 
 get_brightness() {
     # Check if cache is fresh (ddcutil can be slow)
@@ -46,6 +47,29 @@ set_brightness() {
     fi
 }
 
+save_brightness() {
+    # Save current brightness to restore later
+    local current
+    current=$(get_brightness)
+    echo "$current" >"$SAVE_FILE"
+}
+
+restore_brightness() {
+    # Restore previously saved brightness
+    local saved
+    if [[ -f "$SAVE_FILE" ]]; then
+        saved=$(cat "$SAVE_FILE")
+        set_brightness "$saved"
+        rm -f "$SAVE_FILE" # clean up after restoring
+    fi
+}
+
+dim_brightness() {
+    # Save current and dim to 1%
+    save_brightness
+    set_brightness 1
+}
+
 case "$1" in
 "up")
     current=$(get_brightness)
@@ -56,6 +80,15 @@ case "$1" in
     current=$(get_brightness)
     new_brightness=$((current - STEP))
     set_brightness "$new_brightness"
+    ;;
+"save")
+    save_brightness
+    ;;
+"restore")
+    restore_brightness
+    ;;
+"dim")
+    dim_brightness
     ;;
 "get" | "")
     brightness=$(get_brightness)
