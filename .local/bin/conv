@@ -5,20 +5,26 @@ which -s soffice || { echo "soffice not found."; exit 1; }
 which -s magick || { echo "magick not found."; exit 1; }
 which -s ebook-convert || { echo "ebook-convert not found."; exit 1; }
 
-convert_from="$1"
-convert_to="$2"
+files=("${@:1:$#-1}")
+convert_to="${@: -1}"
 
-filename="${convert_from%.*}"
-convert_from_extension="${convert_from##*.}"
 
-if [ "$convert_to" = "pdf" ]; then
-    # Document conversion
-    if [ "$convert_from_extension" = "docx" ] || [ "$convert_from_extension" = "odt" ]; then
-        soffice --headless --convert-to pdf "$convert_from"
-    elif [ "$convert_from_extension" = "epub" ]; then
-        ebook-convert "$convert_from" "$filename.pdf"
+for convert_from in "${files[@]}"; do
+    [ -f "$convert_from" ] || { echo "$convert_from not found."; exit 1; }
+    filename="${convert_from%.*}"
+    convert_from_extension="${convert_from##*.}"
+    if [ "$convert_to" = "pdf" ]; then
+        # Document conversion
+        if [ "$convert_from_extension" = "docx" ] || [ "$convert_from_extension" = "odt" ]; then
+            soffice --headless --convert-to pdf "$convert_from"
+            echo "Converting $convert_from to $filename.pdf"
+        elif [ "$convert_from_extension" = "epub" ]; then
+            ebook-convert "$convert_from" "$filename.pdf"
+            echo "Converting $convert_from to $filename.pdf"
+        fi
+    elif [ "$convert_to" = "jpg" ] || [ "$convert_to" = "png" ]; then
+        # Image conversion
+        magick "$convert_from" "$filename.$convert_to"
+        echo "Converting $convert_from to $filename.$convert_to"
     fi
-elif [ "$convert_to" = "jpg" ] || [ "$convert_to" = "png" ]; then
-    # Image conversion
-    magick "$convert_from" "$filename.$convert_to"
-fi
+done
