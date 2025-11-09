@@ -17,8 +17,6 @@ for convert_from in "${files[@]}"; do
     case "$convert_to" in
         jpg|png|webp|gif)
             # Image conversion
-            # magick "$convert_from" "$filename.$convert_to"
-            # echo "Converting $convert_from to $filename.$convert_to"
             echo "Converting $convert_from to $filename.$convert_to"
             magick "$convert_from" "$filename.$convert_to" \
                 && echo -e "\tDone." \
