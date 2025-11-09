@@ -11,13 +11,14 @@ convert_to="$2"
 filename="${convert_from%.*}"
 convert_from_extension="${convert_from##*.}"
 
-# Document conversion
 if [ "$convert_to" = "pdf" ]; then
+    # Document conversion
     if [ "$convert_from_extension" = "docx" ] || [ "$convert_from_extension" = "odt" ]; then
         soffice --headless --convert-to pdf "$convert_from"
     elif [ "$convert_from_extension" = "epub" ]; then
         ebook-convert "$convert_from" "$filename.pdf"
     fi
 elif [ "$convert_to" = "jpg" ] || [ "$convert_to" = "png" ]; then
+    # Image conversion
     magick "$convert_from" "$filename.$convert_to"
 fi
