@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Check dependencies
+which -s soffice || { echo "soffice not found."; exit 1; }
+which -s magick || { echo "magick not found."; exit 1; }
+which -s ebook-convert || { echo "ebook-convert not found."; exit 1; }
+
+convert_from="$1"
+convert_to="$2"
+
+filename="${convert_from%.*}"
+convert_from_extension="${convert_from##*.}"
+
+# Document conversion
+if [ "$convert_to" = "pdf" ]; then
+    if [ "$convert_from_extension" = "docx" ] || [ "$convert_from_extension" = "odt" ]; then
+        soffice --headless --convert-to pdf "$convert_from"
+    elif [ "$convert_from_extension" = "epub" ]; then
+        ebook-convert "$convert_from" "$filename.pdf"
+    fi
+elif [ "$convert_to" = "jpg" ] || [ "$convert_to" = "png" ]; then
+    magick "$convert_from" "$filename.$convert_to"
+fi
