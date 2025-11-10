@@ -42,7 +42,7 @@ for convert_from in "${files[@]}"; do
     pdf)
         # Document conversion
         case "$convert_from_extension" in
-        docx | odt)
+        docx | doc | odt)
             echo "Converting $convert_from to $filename.pdf"
             soffice --headless --convert-to pdf "$convert_from" &&
                 echo -e "\tDone." ||
