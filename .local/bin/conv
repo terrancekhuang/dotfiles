@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 # Check dependencies
-which soffice || {
+which soffice &>/dev/null || {
     echo "soffice not found."
     exit 1
 }
-which magick || {
+which magick &>/dev/null || {
     echo "magick not found."
     exit 1
 }
-which ebook-convert || {
+which ebook-convert &>/dev/null || {
     echo "ebook-convert not found."
     exit 1
 }
