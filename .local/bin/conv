@@ -41,22 +41,26 @@ for convert_from in "${files[@]}"; do
         ;;
     pdf)
         # Document conversion
-        if [ "$convert_from_extension" = "docx" ] || [ "$convert_from_extension" = "odt" ]; then
+        case "$convert_from_extension" in
+        docx | odt)
             echo "Converting $convert_from to $filename.pdf"
             soffice --headless --convert-to pdf "$convert_from" &&
                 echo -e "\tDone." ||
                 echo -e "\tConversion failed."
-        elif [ "$convert_from_extension" = "epub" ]; then
+            ;;
+        epub)
             echo "Converting $convert_from to $filename.pdf"
             ebook-convert "$convert_from" "$filename.pdf" &&
                 echo -e "\tDone." ||
                 echo -e "\tConversion failed."
-        elif [ "$convert_from_extension" = "md" ]; then
+            ;;
+        md | txt)
             echo "Converting $convert_from to $filename.pdf"
             pandoc "$convert_from" -o "$filename.pdf" &&
                 echo -e "\tDone." ||
                 echo -e "\tConversion failed."
-        fi
+            ;;
+        esac
         ;;
     *)
         echo "Unsupported format: $convert_to"
