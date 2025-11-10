@@ -14,6 +14,11 @@ which ebook-convert &>/dev/null || {
     exit 1
 }
 
+which pandoc &>/dev/null || {
+    echo "pandoc not found."
+    exit 1
+}
+
 files=("${@:1:$#-1}")
 convert_to="${@: -1}"
 
@@ -44,6 +49,11 @@ for convert_from in "${files[@]}"; do
         elif [ "$convert_from_extension" = "epub" ]; then
             echo "Converting $convert_from to $filename.pdf"
             ebook-convert "$convert_from" "$filename.pdf" &&
+                echo -e "\tDone." ||
+                echo -e "\tConversion failed."
+        elif [ "$convert_from_extension" = "md" ]; then
+            echo "Converting $convert_from to $filename.pdf"
+            pandoc "$convert_from" -o "$filename.pdf" &&
                 echo -e "\tDone." ||
                 echo -e "\tConversion failed."
         fi
