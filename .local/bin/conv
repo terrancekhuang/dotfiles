@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# Check dependencies
+which soffice || {
+    echo "soffice not found."
+    exit 1
+}
+which magick || {
+    echo "magick not found."
+    exit 1
+}
+which ebook-convert || {
+    echo "ebook-convert not found."
+    exit 1
+}
+
+files=("${@:1:$#-1}")
+convert_to="${@: -1}"
+
+for convert_from in "${files[@]}"; do
+    [ -f "$convert_from" ] || {
+        echo "$convert_from not found."
+        exit 1
+    }
+
+    filename="${convert_from%.*}"
+    convert_from_extension="${convert_from##*.}"
+
+    case "$convert_to" in
+    jpg | png | webp | gif)
+        # Image conversion
+        echo "Converting $convert_from to $filename.$convert_to"
+        magick "$convert_from" "$filename.$convert_to" &&
+            echo -e "\tDone." ||
+            echo -e "\tConversion failed."
+        ;;
+    pdf)
+        # Document conversion
+        if [ "$convert_from_extension" = "docx" ] || [ "$convert_from_extension" = "odt" ]; then
+            echo "Converting $convert_from to $filename.pdf"
+            soffice --headless --convert-to pdf "$convert_from" &&
+                echo -e "\tDone." ||
+                echo -e "\tConversion failed."
+        elif [ "$convert_from_extension" = "epub" ]; then
+            echo "Converting $convert_from to $filename.pdf"
+            ebook-convert "$convert_from" "$filename.pdf" &&
+                echo -e "\tDone." ||
+                echo -e "\tConversion failed."
+        fi
+        ;;
+    *)
+        echo "Unsupported format: $convert_to"
+        exit 1
+        ;;
+    esac
+done
