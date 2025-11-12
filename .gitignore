@@ -1,3 +1,4 @@
 .config/zsh/.zsh_history
 .gitconfig
 .config/nvim/lazy-lock.json
+.config/nvim/spell/
