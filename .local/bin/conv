@@ -19,6 +19,11 @@ which pandoc &>/dev/null || {
     exit 1
 }
 
+which weasyprint &>/dev/null || {
+    echo "weasyprint not found."
+    exit 1
+}
+
 files=("${@:1:$#-1}")
 convert_to="${@: -1}"
 
