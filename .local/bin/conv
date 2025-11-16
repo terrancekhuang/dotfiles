@@ -25,7 +25,7 @@ which weasyprint &>/dev/null || {
 }
 
 files=("${@:1:$#-1}")
-convert_to="${@: -1}"
+convert_to="${!#}"
 
 for convert_from in "${files[@]}"; do
     [ -f "$convert_from" ] || {
