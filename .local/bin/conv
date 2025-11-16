@@ -62,7 +62,7 @@ for convert_from in "${files[@]}"; do
             ;;
         html)
             echo "Converting $convert_from to $filename.pdf"
-            wkhtmltopdf "$convert_from" "$filename.pdf" &&
+            weasyprint "$convert_from" "$filename.pdf" &&
                 echo -e "\tDone." ||
                 echo -e "\tConversion failed."
             ;;
