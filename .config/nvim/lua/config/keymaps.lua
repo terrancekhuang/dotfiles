@@ -16,3 +16,16 @@ vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', opts)
 vim.keymap.set({ "n", "v" }, "<leader>P", '"+P', opts)
 
 vim.keymap.set("i", "<S-Tab>", "<C-d>", opts)
+
+-- When in linewise visual mode,
+-- substitute only within exact bounds
+vim.keymap.set("v", ":s", function()
+  local mode = vim.fn.mode()
+  if mode == "v" then
+    return ":s/\\%V"
+    -- When in blockwise visual mode,
+    -- acts as normal substitution command
+  elseif mode == "V" then
+    return ":s/"
+  end
+end, { expr = true })
