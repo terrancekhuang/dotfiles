@@ -17,15 +17,16 @@ vim.keymap.set({ "n", "v" }, "<leader>P", '"+P', opts)
 
 vim.keymap.set("i", "<S-Tab>", "<C-d>", opts)
 
--- When in linewise visual mode,
+-- When in character-wise or block-wise visual mode,
 -- substitute only within exact bounds
 vim.keymap.set("v", ":s", function()
   local mode = vim.fn.mode()
-  if mode == "v" then
+  -- \22 is Ctrl-V control character
+  if mode == "v" or mode == "\22" then
     return ":s/\\%V"
-    -- When in blockwise visual mode,
+    -- When in line-wise visual mode,
     -- acts as normal substitution command
   elseif mode == "V" then
-    return ":s/"
+    return ":s"
   end
 end, { expr = true })
