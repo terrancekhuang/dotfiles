@@ -23,7 +23,9 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
 -- Timeout
+vim.opt.timeout = true
 vim.opt.timeoutlen = 100
+vim.opt.ttimeout = true
 vim.opt.ttimeoutlen = 0
 
 -- Scrolling
