@@ -4,6 +4,7 @@ scan_timeout = 100
 add_newline = false
 format = """\
   $os\
+  $status\
   $directory\
   $git_branch$git_commit$git_state $git_status\
   $character\n
@@ -72,7 +73,6 @@ $rlang\
 $php\
 $crystal\
 $custom\
-$status\
 $time"""
 
 continuation_prompt = '▶▶ '
@@ -104,6 +104,11 @@ Macos = " "            # nf-linux-apple
 # [character]
 # success_symbol = "[  ]($bold fg:#f8f8f2)"
 # error_symbol = "[ ➤ ]($bold fg:#fb4934)"
+
+[status]
+style = 'fg:#fb4934'
+format = '[$int$signal_name]($style) '
+disabled = false
 
 [directory]
 disabled = false
