@@ -65,17 +65,28 @@ alias .5='cd ../../../../..'
 # Safety aliases
 alias rm='rm -i'                                            # don't do anything stupid
 
+# Set brightness
+setbrightness() {
+    local brightness=$1
+    if [[ $brightness -gt 100 ]]; then
+        brightness=100
+    elif [[ $brightness -lt 1 ]]; then
+        brightness=1
+    fi
+    ddcutil --terse setvcp 10 $brightness > /dev/null 2>&1
+}
+
 # ============================================================================
 # Application Aliases
 # ============================================================================
 alias vc='code'                                             # VS Code
 
 # Open apps detached
-vlc() { command vlc "$@" &>/dev/null & disown }
-zathura() { command zathura "$@" &>/dev/null & disown }
-libreoffice() { command libreoffice "$@" &>/dev/null & disown }
-loupe() { command loupe "$@" &>/dev/null & disown }
-darktable() { command darktable "$@" &>/dev/null & disown }
+vlc() { command vlc "$@" &>/dev/null & disown; }
+zathura() { command zathura "$@" &>/dev/null & disown; }
+libreoffice() { command libreoffice "$@" &>/dev/null & disown; }
+loupe() { command loupe "$@" &>/dev/null & disown; }
+darktable() { command darktable "$@" &>/dev/null & disown; }
 
 # ============================================================================
 # Clipboard Management
