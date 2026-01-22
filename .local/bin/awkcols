@@ -1,0 +1,60 @@
+#!/bin/bash
+
+delimiter=""
+
+while getopts "F:" opt; do
+    case $opt in
+        F)
+            delimiter="$OPTARG"
+            ;;
+        \?)
+            echo "Usage: $0 [-F delimiter] [file]" >$2
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+input_source="${1:-/dev/stdin}"
+
+awk -v delim="$delimiter" '
+BEGIN {
+  # Set field separator
+  if (delim != "") {
+    FS = delim
+    OFS = FS
+  }
+  first_line = 1
+}
+{
+  if (first_line) {
+    # Print column numbers aligned with fields
+    for (i = 1; i <= NF; i++) {
+      field_width = length($i)
+      col_num = i
+      col_num_str = sprintf("%d", col_num)
+      
+      # Center or left-align the column number within the field width
+      if (field_width >= length(col_num_str)) {
+        printf "%-*s", field_width, col_num_str
+      } else {
+        printf "%s", col_num_str
+      }
+      
+      if (i < NF) {
+        if (delim != "") {
+          printf "%s", OFS
+        } else {
+          printf " "
+        }
+      }
+    }
+    printf "\n"
+    first_line = 0
+  }
+  
+  # Print the actual line
+  print $0
+}
+' "$input_source"
