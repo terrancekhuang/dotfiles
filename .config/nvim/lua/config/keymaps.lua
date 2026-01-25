@@ -7,7 +7,7 @@ local opts = {
   silent = true,
 }
 
-vim.keymap.set("v", "J", "mzJ`z", opts)
+vim.keymap.set("n", "J", "mzJ`z", opts)
 vim.keymap.set("n", "n", "nzzzv", opts)
 vim.keymap.set("n", "N", "Nzzzv", opts)
 
