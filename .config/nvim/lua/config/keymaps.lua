@@ -19,6 +19,10 @@ vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
 vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', opts)
 vim.keymap.set({ "n", "v" }, "<leader>P", '"+P', opts)
 
+-- Moving blocks of code
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+
 -- Unindent with shift tab
 vim.keymap.set("i", "<S-Tab>", "<C-d>", opts)
 
