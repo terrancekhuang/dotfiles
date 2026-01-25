@@ -7,16 +7,19 @@ local opts = {
   silent = true,
 }
 
+-- Keeping it centered
 vim.keymap.set("n", "J", "mzJ`z", opts)
 vim.keymap.set("n", "<C-d>", "<C-d>zz", opts)
 vim.keymap.set("n", "<C-u>", "<C-u>zz", opts)
 vim.keymap.set("n", "n", "nzzzv", opts)
 vim.keymap.set("n", "N", "Nzzzv", opts)
 
+-- Copy and paste from main clipboard
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', opts)
 vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', opts)
 vim.keymap.set({ "n", "v" }, "<leader>P", '"+P', opts)
 
+-- Unindent with shift tab
 vim.keymap.set("i", "<S-Tab>", "<C-d>", opts)
 
 -- When in character-wise or block-wise visual mode,
