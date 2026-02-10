@@ -4,7 +4,7 @@
 # Usage: brightness.sh [up|down|get]
 
 STEP=10
-BUS="3" # Your monitor is on /dev/i2c-3
+BUS="2" # Your monitor is on /dev/i2c-2
 CACHE_FILE="/tmp/brightness_cache"
 CACHE_TIMEOUT=2  # seconds
 SLEEP_MULT="0.1" # Sleep multiplier for faster DDC operations
