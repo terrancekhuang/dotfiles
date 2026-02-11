@@ -87,6 +87,7 @@ zathura() { command zathura "$@" &>/dev/null & disown; }
 libreoffice() { command libreoffice "$@" &>/dev/null & disown; }
 loupe() { command loupe "$@" &>/dev/null & disown; }
 darktable() { command darktable "$@" &>/dev/null & disown; }
+okular() { command okular "$@" &>/dev/null & disown; }
 
 # ============================================================================
 # Clipboard Management
