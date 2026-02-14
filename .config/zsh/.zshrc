@@ -95,14 +95,6 @@ okular() { command okular "$@" &>/dev/null & disown; }
 alias ccb='wl-copy < /dev/null'                             # clear clipboard
 
 # ============================================================================
-# Session Management
-# ============================================================================
-# Attach tmux on startup
-if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-    tmux attach-session -t main || tmux new-session -s main
-fi
-
-# ============================================================================
 # SSH Agent
 # ============================================================================
 # Start ssh agent automatically
