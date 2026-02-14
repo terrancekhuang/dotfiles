@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    INPUT_DATE="@$(date +%s)"
+else
+    INPUT_DATE="$1"
+fi
+
+OFFSET=$(date --date "$INPUT_DATE" +%:::z)
+
+declare -A tz
+tz["+00"]="Z"
+tz["+01"]="A"
+tz["+02"]="B"
+tz["+03"]="C"
+tz["+04"]="D"
+tz["+05"]="E"
+tz["+06"]="F"
+tz["+07"]="G"
+tz["+08"]="H"
+tz["+09"]="I"
+tz["+10"]="K"
+tz["+11"]="L"
+tz["+12"]="M"
+tz["-01"]="N"
+tz["-02"]="O"
+tz["-03"]="P"
+tz["-04"]="Q"
+tz["-05"]="R"
+tz["-06"]="S"
+tz["-07"]="T"
+tz["-08"]="U"
+tz["-09"]="V"
+tz["-10"]="W"
+tz["-11"]="X"
+tz["-12"]="Y"
+
+ZONE=${tz[$OFFSET]}
+
+date --date "$INPUT_DATE" "+%d %H%M$ZONE %^b %y"
