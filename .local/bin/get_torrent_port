@@ -5,7 +5,7 @@ while true; do
     if [ $? -eq 0 ]; then
         echo "$output" | grep -oP 'Mapped public port \K\d+' | head -1
     else
-        printf "%s\nERROR with natpmpc command\n", "$(date)" >&2
+        printf "%s\nERROR with natpmpc command\n" "$(date)" >&2
         break
     fi
     sleep 45
