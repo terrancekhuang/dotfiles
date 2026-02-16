@@ -1,0 +1,13 @@
+#!/bin/bash
+
+latlong=$(curl -s ifconfig.co/json | jq -r '.latitude, .longitude')
+
+IFS=$'\n' read -d '' -r latitude longitude <<<"$latlong"
+root="https://api.weather.gov"
+header="Accept: application/geo+json"
+
+obsStationsUrl=$(curl -s "$root/points/$latitude,$longitude" -H "$header" | jq -r '.properties.observationStations')
+stationId=$(curl -s "$obsStationsUrl" -H "$header" | jq -r '.features[0].properties.stationIdentifier')
+
+obsLatest=$(curl -s "$root/stations/$stationId/observations/latest" -H "$header" | jq -r '.properties.temperature.value')
+printf "%s°C\n" "$obsLatest"
