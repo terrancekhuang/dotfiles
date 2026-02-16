@@ -6,8 +6,13 @@ IFS=$'\n' read -d '' -r latitude longitude <<<"$latlong"
 root="https://api.weather.gov"
 header="Accept: application/geo+json"
 
-obsStationsUrl=$(curl -s "$root/points/$latitude,$longitude" -H "$header" | jq -r '.properties.observationStations')
-stationId=$(curl -s "$obsStationsUrl" -H "$header" | jq -r '.features[0].properties.stationIdentifier')
+pointsResult=$(curl -s "$root/points/$latitude,$longitude" -H "$header")
+obsStationsUrl=$(echo "$pointsResult" | jq -r '.properties.observationStations')
+forecastUrl=$(echo "$pointsResult" | jq -r '.properties.forecast + "?units=si"')
 
+stationId=$(curl -s "$obsStationsUrl" -H "$header" | jq -r '.features[0].properties.stationIdentifier')
 obsLatest=$(curl -s "$root/stations/$stationId/observations/latest" -H "$header" | jq -r '.properties.temperature.value')
+
+forecastDescription=$(curl -s "$forecastUrl" -H "$header" | jq -r '.properties.periods[0].detailedForecast')
 printf "%s°C\n" "$obsLatest"
+printf "%s\n" "$forecastDescription"
