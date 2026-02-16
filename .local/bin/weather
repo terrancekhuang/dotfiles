@@ -1,13 +1,97 @@
 #!/bin/bash
 
-latlong=$(curl -s ifconfig.co/json | jq -r '.latitude, .longitude')
+# Parse command line arguments
+VERBOSE=false
+if [ "$1" = "-v" ]; then
+    VERBOSE=true
+fi
+
+# Function to print verbose messages
+log_verbose() {
+    if [ "$VERBOSE" = true ]; then
+        echo "$1" >&2
+    fi
+}
+
+# Function to make curl request with error handling
+make_request() {
+    local url="$1"
+    local description="$2"
+    local header="${3:-}"
+
+    local response
+    local http_code
+
+    if [ -n "$header" ]; then
+        response=$(curl -s -w "\n%{http_code}" "$url" -H "$header")
+    else
+        response=$(curl -s -w "\n%{http_code}" "$url")
+    fi
+
+    http_code=$(echo "$response" | tail -n1)
+    response=$(echo "$response" | sed '$d')
+
+    if [ "$http_code" -ne 200 ]; then
+        echo "Error: Failed to $description (HTTP $http_code)" >&2
+        return 1
+    fi
+
+    echo "$response"
+}
+
+# Get location from ifconfig.co
+log_verbose "Fetching location..."
+location_json=$(make_request "https://ifconfig.co/json" "fetch location") || exit 1
+
+latlong=$(echo "$location_json" | jq -r '.latitude, .longitude')
+if [ -z "$latlong" ]; then
+    echo "Error: Could not parse latitude/longitude from location data" >&2
+    exit 1
+fi
 
 IFS=$'\n' read -d '' -r latitude longitude <<<"$latlong"
+
+if [ -z "$latitude" ] || [ -z "$longitude" ]; then
+    echo "Error: Invalid latitude or longitude" >&2
+    exit 1
+fi
+
+log_verbose "Location: $latitude, $longitude"
+
+# Set up API parameters
 root="https://api.weather.gov"
 header="Accept: application/geo+json"
 
-obsStationsUrl=$(curl -s "$root/points/$latitude,$longitude" -H "$header" | jq -r '.properties.observationStations')
-stationId=$(curl -s "$obsStationsUrl" -H "$header" | jq -r '.features[0].properties.stationIdentifier')
+# Get observation stations URL
+log_verbose "Fetching weather station info..."
+points_json=$(make_request "$root/points/$latitude,$longitude" "fetch weather points" "$header") || exit 1
 
-obsLatest=$(curl -s "$root/stations/$stationId/observations/latest" -H "$header" | jq -r '.properties.temperature.value')
+obsStationsUrl=$(echo "$points_json" | jq -r '.properties.observationStations')
+if [ -z "$obsStationsUrl" ] || [ "$obsStationsUrl" = "null" ]; then
+    echo "Error: Could not find observation stations URL" >&2
+    exit 1
+fi
+
+# Get station ID
+log_verbose "Finding nearest weather station..."
+stations_json=$(make_request "$obsStationsUrl" "fetch station list" "$header") || exit 1
+
+stationId=$(echo "$stations_json" | jq -r '.features[0].properties.stationIdentifier')
+if [ -z "$stationId" ] || [ "$stationId" = "null" ]; then
+    echo "Error: Could not find station identifier" >&2
+    exit 1
+fi
+
+log_verbose "Using station: $stationId"
+
+# Get latest observation
+log_verbose "Fetching current temperature..."
+obs_json=$(make_request "$root/stations/$stationId/observations/latest" "fetch latest observation" "$header") || exit 1
+
+obsLatest=$(echo "$obs_json" | jq -r '.properties.temperature.value')
+if [ -z "$obsLatest" ] || [ "$obsLatest" = "null" ]; then
+    echo "Error: Could not parse temperature from observation data" >&2
+    exit 1
+fi
+
 printf "%s°C\n" "$obsLatest"
