@@ -4,5 +4,8 @@ return {
     checkbox = {
       enabled = true,
     },
+    latex = {
+      enabled = false,
+    },
   },
 }
