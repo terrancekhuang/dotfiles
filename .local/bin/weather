@@ -25,9 +25,7 @@ cache_expired() {
 }
 
 if $no_cache || cache_expired "$location_cache"; then
-    # curl -s ifconfig.co/json >"$location_cache"
-    curl -s --keepalive --keepalive-time 10 \
-        "$root/points/$latitude,$longitude" -H "$header" >"$points_cache"
+    curl -s ifconfig.co/json >"$location_cache"
 fi
 latlong=$(jq -r '.latitude, .longitude' "$location_cache")
 IFS=$'\n' read -d '' -r latitude longitude <<<"$latlong"
@@ -40,15 +38,13 @@ pointsResult=$(cat "$points_cache")
 obsStationsUrl=$(echo "$pointsResult" | jq -r '.properties.observationStations')
 forecastUrl=$(echo "$pointsResult" | jq -r '.properties.forecast + "?units=si"')
 
-# curl -s "$forecastUrl" -H "$header" >"$tmp_forecast" &
-# curl -s "$obsStationsUrl" -H "$header" >"$tmp_stations" &
-# wait
-curl --parallel --parallel-immediate --keepalive --keepalive-time 10 -s \
-    -H "$header" "$forecastUrl" -o "$tmp_forecast" \
-    -H "$header" "$obsStationsUrl" -o "$tmp_stations"
+curl -s "$forecastUrl" -H "$header" >"$tmp_forecast" &
+curl -s "$obsStationsUrl" -H "$header" >"$tmp_stations" &
+wait
 
 stationId=$(jq -r '.features[0].properties.stationIdentifier' "$tmp_stations")
-curl -s "$root/stations/$stationId/observations/latest" -H "$header" >"$tmp_obs"
+curl -s --keepalive --keepalive-time 10 \
+    -H "$header" "$root/stations/$stationId/observations/latest" -o "$tmp_obs"
 
 obsLatest=$(jq -r '.properties.temperature.value' "$tmp_obs")
 forecastDescription=$(jq -r '.properties.periods[0].detailedForecast' "$tmp_forecast")
