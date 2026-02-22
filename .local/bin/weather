@@ -1,18 +1,57 @@
 #!/bin/bash
 
-latlong=$(curl -s ifconfig.co/json | jq -r '.latitude, .longitude')
-
-IFS=$'\n' read -d '' -r latitude longitude <<<"$latlong"
 root="https://api.weather.gov"
 header="Accept: application/geo+json"
+cache_dir="$HOME/.cache/weather"
+location_cache="$cache_dir/location.json"
+points_cache="$cache_dir/points.json"
+no_cache=false
 
-pointsResult=$(curl -s "$root/points/$latitude,$longitude" -H "$header")
+for arg in "$@"; do
+    case $arg in
+    --no-cache) no_cache=true ;;
+    esac
+done
+
+mkdir -p "$cache_dir"
+
+tmp_forecast=$(mktemp)
+tmp_stations=$(mktemp)
+tmp_obs=$(mktemp)
+trap 'rm -f "$tmp_forecast" "$tmp_stations" "$tmp_obs"' EXIT
+
+cache_expired() {
+    [[ ! -f "$1" || -n $(find "$1" -mtime +30 2>/dev/null) ]]
+}
+
+if $no_cache || cache_expired "$location_cache"; then
+    # curl -s ifconfig.co/json >"$location_cache"
+    curl -s --keepalive --keepalive-time 10 \
+        "$root/points/$latitude,$longitude" -H "$header" >"$points_cache"
+fi
+latlong=$(jq -r '.latitude, .longitude' "$location_cache")
+IFS=$'\n' read -d '' -r latitude longitude <<<"$latlong"
+
+if $no_cache || cache_expired "$points_cache"; then
+    curl -s "$root/points/$latitude,$longitude" -H "$header" >"$points_cache"
+fi
+pointsResult=$(cat "$points_cache")
+
 obsStationsUrl=$(echo "$pointsResult" | jq -r '.properties.observationStations')
 forecastUrl=$(echo "$pointsResult" | jq -r '.properties.forecast + "?units=si"')
 
-stationId=$(curl -s "$obsStationsUrl" -H "$header" | jq -r '.features[0].properties.stationIdentifier')
-obsLatest=$(curl -s "$root/stations/$stationId/observations/latest" -H "$header" | jq -r '.properties.temperature.value')
+# curl -s "$forecastUrl" -H "$header" >"$tmp_forecast" &
+# curl -s "$obsStationsUrl" -H "$header" >"$tmp_stations" &
+# wait
+curl --parallel --parallel-immediate --keepalive --keepalive-time 10 -s \
+    -H "$header" "$forecastUrl" -o "$tmp_forecast" \
+    -H "$header" "$obsStationsUrl" -o "$tmp_stations"
 
-forecastDescription=$(curl -s "$forecastUrl" -H "$header" | jq -r '.properties.periods[0].detailedForecast')
+stationId=$(jq -r '.features[0].properties.stationIdentifier' "$tmp_stations")
+curl -s "$root/stations/$stationId/observations/latest" -H "$header" >"$tmp_obs"
+
+obsLatest=$(jq -r '.properties.temperature.value' "$tmp_obs")
+forecastDescription=$(jq -r '.properties.periods[0].detailedForecast' "$tmp_forecast")
+
 printf "%s°C\n" "$obsLatest"
 printf "%s\n" "$forecastDescription"
