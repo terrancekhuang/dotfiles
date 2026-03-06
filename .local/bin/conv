@@ -77,6 +77,10 @@ for convert_from in "${files[@]}"; do
                 echo -e "\tDone." ||
                 echo -e "\tConversion failed."
             ;;
+        *)
+            echo "Unsupported format: $convert_from"
+            exit 1
+            ;;
         esac
         ;;
     *)
