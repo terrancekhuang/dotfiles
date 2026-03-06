@@ -53,6 +53,12 @@ for convert_from in "${files[@]}"; do
                 echo -e "\tDone." ||
                 echo -e "\tConversion failed."
             ;;
+        pptx | odp)
+            echo "Converting $convert_from to $filename.pdf"
+            soffice --headless --convert-to pdf "$convert_from" &&
+                echo -e "\tDone." ||
+                echo -e "\tConversion failed."
+            ;;
         epub)
             echo "Converting $convert_from to $filename.pdf"
             ebook-convert "$convert_from" "$filename.pdf" &&
