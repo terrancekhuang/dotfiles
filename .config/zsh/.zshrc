@@ -83,6 +83,7 @@ alias vc='code'                                             # VS Code
 
 # Open apps detached
 vlc() { command vlc "$@" &>/dev/null & disown; }
+mpv() { command mpv "$@" &>/dev/null & disown; }
 zathura() { command zathura "$@" &>/dev/null & disown; }
 libreoffice() { command libreoffice "$@" &>/dev/null & disown; }
 loupe() { command loupe "$@" &>/dev/null & disown; }
