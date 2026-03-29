@@ -89,6 +89,7 @@ libreoffice() { command libreoffice "$@" &>/dev/null & disown; }
 loupe() { command loupe "$@" &>/dev/null & disown; }
 darktable() { command darktable "$@" &>/dev/null & disown; }
 okular() { command okular "$@" &>/dev/null & disown; }
+xournalpp() { command xournalpp "$@" &>/dev/null & disown; }
 
 # ============================================================================
 # Clipboard Management
