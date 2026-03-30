@@ -281,7 +281,7 @@
 	"custom/system_update": {
 		"exec": "~/.config/waybar/scripts/system-update.sh",
 		"return-type": "json",
-		"interval": 3600,
+		"interval": 1800,
 		"format": "{}",
 		"min-length": 2,
 		"max-length": 2,
