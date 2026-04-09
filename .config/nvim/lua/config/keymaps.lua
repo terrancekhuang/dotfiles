@@ -37,3 +37,5 @@ vim.keymap.set("v", ":s", function()
     return ":s"
   end
 end, { expr = true })
+
+vim.api.nvim_create_user_command("W", "SudaWrite", {})
