@@ -48,5 +48,5 @@ curl -s -H "$header" "$root/stations/$stationId/observations/latest" -o "$tmp_ob
 obsLatest=$(jq -r '.properties.temperature.value' "$tmp_obs")
 forecastDescription=$(jq -r '.properties.periods[0].detailedForecast' "$tmp_forecast")
 
-printf "%s°C\n" "$obsLatest"
-printf "%s\n" "$forecastDescription"
+printf "%s°C\n" "$obsLatest" | fmt -w 80
+printf "%s\n" "$forecastDescription" | fmt -w 80
