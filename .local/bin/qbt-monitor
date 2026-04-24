@@ -1,0 +1,149 @@
+#!/bin/bash
+
+QBT_HOST="http://localhost:8080"
+COOKIE_FILE="/tmp/qbt_cookie.txt"
+REFRESH=10
+
+# ── Auth ─────────────────────────────────────────────────────────────────────
+
+login_qbt() {
+    curl -s -c "$COOKIE_FILE" \
+        "$QBT_HOST/api/v2/auth/login" \
+        -d "username=admin&password=$(cat ~/.config/qbt_pass)" >/dev/null
+}
+
+# ── Formatters ────────────────────────────────────────────────────────────────
+
+format_speed() {
+    local bps=$1
+    if [ "$bps" -ge 1073741824 ]; then
+        printf "%.1fGB/s" "$(echo "$bps/1073741824" | bc -l)"
+    elif [ "$bps" -ge 1048576 ]; then
+        printf "%.1fMB/s" "$(echo "$bps/1048576" | bc -l)"
+    elif [ "$bps" -ge 1024 ]; then
+        printf "%.1fKB/s" "$(echo "$bps/1024" | bc -l)"
+    else
+        printf "%dB/s" "$bps"
+    fi
+}
+
+format_eta() {
+    local secs=$1
+    if [ "$secs" -eq 8640000 ] || [ "$secs" -le 0 ]; then
+        echo "∞"
+    elif [ "$secs" -ge 3600 ]; then
+        printf "%dh%dm" $((secs / 3600)) $(((secs % 3600) / 60))
+    elif [ "$secs" -ge 60 ]; then
+        printf "%dm%ds" $((secs / 60)) $((secs % 60))
+    else
+        printf "%ds" "$secs"
+    fi
+}
+
+format_size() {
+    local bytes=$1
+    if [ "$bytes" -ge 1073741824 ]; then
+        printf "%.2fGB" "$(echo "$bytes/1073741824" | bc -l)"
+    elif [ "$bytes" -ge 1048576 ]; then
+        printf "%.2fMB" "$(echo "$bytes/1048576" | bc -l)"
+    elif [ "$bytes" -ge 1024 ]; then
+        printf "%.1fKB" "$(echo "$bytes/1024" | bc -l)"
+    else
+        printf "%dB" "$bytes"
+    fi
+}
+
+state_color() {
+    case "$1" in
+    downloading) printf "\e[32m" ;;
+    uploading) printf "\e[34m" ;;
+    stalledDL | stalledUP) printf "\e[33m" ;;
+    pausedDL | pausedUP) printf "\e[90m" ;;
+    errored) printf "\e[31m" ;;
+    *) printf "\e[0m" ;;
+    esac
+}
+
+RESET="\e[0m"
+BOLD="\e[1m"
+DIM="\e[2m"
+
+# Fixed column widths (excluding name)
+# ↓SPEED(8) ↑SPEED(8) SIZE(8) RATIO(6) ETA(8) STATE(12) + separators
+FIXED_COLS=$((8 + 2 + 8 + 2 + 8 + 2 + 6 + 2 + 8 + 2 + 12))
+
+# ── Main draw ─────────────────────────────────────────────────────────────────
+
+draw() {
+    local json
+    json=$(curl -s -b "$COOKIE_FILE" \
+        "$QBT_HOST/api/v2/torrents/info?filter=active&sort=eta")
+
+    if echo "$json" | grep -q "Forbidden\|Unauthorized\|error"; then
+        login_qbt
+        json=$(curl -s -b "$COOKIE_FILE" \
+            "$QBT_HOST/api/v2/torrents/info?filter=active&sort=eta")
+    fi
+
+    local term_width
+    term_width=$(tput cols)
+
+    # Name column gets whatever is left over
+    local name_w=$((term_width - FIXED_COLS))
+    [ "$name_w" -lt 10 ] && name_w=10
+
+    local count total_dl total_ul
+    count=$(echo "$json" | jq 'length')
+    total_dl=$(echo "$json" | jq '[.[].dlspeed] | add // 0')
+    total_ul=$(echo "$json" | jq '[.[].upspeed]  | add // 0')
+
+    clear
+
+    printf "${BOLD}qBittorrent${RESET}  %s  refresh: %ds   active: %d   ${DIM}▼ %s  ▲ %s${RESET}\n\n" \
+        "$(date '+%H:%M:%S')" "$REFRESH" "$count" \
+        "$(format_speed "$total_dl")" "$(format_speed "$total_ul")"
+
+    # Column headers — widths must match row printf below
+    printf "${BOLD}%-${name_w}s  %8s  %8s  %8s  %6s  %8s  %s${RESET}\n" \
+        "NAME" "↓SPEED" "↑SPEED" "SIZE" "RATIO" "ETA" "STATE"
+    printf '%*s\n' "$term_width" '' | tr ' ' '-'
+
+    echo "$json" | jq -c '.[]' | while read -r t; do
+        local name dlspeed upspeed size ratio eta state
+        name=$(echo "$t" | jq -r '.name')
+        dlspeed=$(echo "$t" | jq -r '.dlspeed')
+        upspeed=$(echo "$t" | jq -r '.upspeed')
+        size=$(echo "$t" | jq -r '.size')
+        ratio=$(echo "$t" | jq -r '.ratio')
+        eta=$(echo "$t" | jq -r '.eta')
+        state=$(echo "$t" | jq -r '.state')
+
+        [ ${#name} -gt "$name_w" ] && name="${name:0:$((name_w - 1))}…"
+
+        local color
+        color=$(state_color "$state")
+
+        printf "${color}%-${name_w}s${RESET}  %8s  %8s  %8s  %6s  %8s  %s\n" \
+            "$name" \
+            "$(format_speed "$dlspeed")" \
+            "$(format_speed "$upspeed")" \
+            "$(format_size "$size")" \
+            "$(printf '%.2f' "$ratio")" \
+            "$(format_eta "$eta")" \
+            "$state"
+    done
+
+    printf '%*s\n' "$term_width" '' | tr ' ' '-'
+    printf "${DIM}Ctrl+C to quit${RESET}\n"
+}
+
+# ── Run ───────────────────────────────────────────────────────────────────────
+
+login_qbt
+trap 'tput cnorm; echo; exit 0' INT TERM
+tput civis
+
+while true; do
+    draw
+    sleep "$REFRESH"
+done
