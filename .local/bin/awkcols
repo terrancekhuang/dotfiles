@@ -1,60 +1,45 @@
 #!/bin/bash
-
-delimiter=""
-
 while getopts "F:" opt; do
     case $opt in
-        F)
-            delimiter="$OPTARG"
-            ;;
-        \?)
-            echo "Usage: $0 [-F delimiter] [file]" >$2
-            exit 1
-            ;;
+        F) delimiter="$OPTARG" ;;
+        \?) echo "Usage: $0 [-F delimiter] [file]" >&2; exit 1 ;;
     esac
 done
-
 shift $((OPTIND-1))
 
-input_source="${1:-/dev/stdin}"
-
-awk -v delim="$delimiter" '
+awk -v delim="${delimiter:-}" '
 BEGIN {
-  # Set field separator
-  if (delim != "") {
-    FS = delim
-    OFS = FS
-  }
-  first_line = 1
+    if (delim != "") FS = delim
 }
+
 {
-  if (first_line) {
-    # Print column numbers aligned with fields
+    row_cols[NR] = NF
     for (i = 1; i <= NF; i++) {
-      field_width = length($i)
-      col_num = i
-      col_num_str = sprintf("%d", col_num)
-      
-      # Center or left-align the column number within the field width
-      if (field_width >= length(col_num_str)) {
-        printf "%-*s", field_width, col_num_str
-      } else {
-        printf "%s", col_num_str
-      }
-      
-      if (i < NF) {
-        if (delim != "") {
-          printf "%s", OFS
-        } else {
-          printf " "
-        }
-      }
+        cell[NR, i] = $i
+        w = length($i)
+        if (w > col_w[i]) col_w[i] = w
     }
-    printf "\n"
-    first_line = 0
-  }
-  
-  # Print the actual line
-  print $0
 }
-' "$input_source"
+
+function print_row(r,    i, sep) {
+    sep = (delim != "") ? delim : " "
+    for (i = 1; i <= row_cols[r]; i++) {
+        printf "%-*s%s", col_w[i], cell[r, i], (i < row_cols[r]) ? sep : "\n"
+    }
+}
+
+END {
+    # Ensure each column is wide enough to hold its column number
+    for (i in col_w)
+        if (length(i) > col_w[i]) col_w[i] = length(i)
+
+    # Print header of column numbers
+    sep = (delim != "") ? delim : " "
+    for (i = 1; i <= row_cols[1]; i++)
+        printf "%-*s%s", col_w[i], i, (i < row_cols[1]) ? sep : "\n"
+
+    # Print data rows
+    for (r = 1; r <= NR; r++)
+        print_row(r)
+}
+' "${1:-/dev/stdin}"
