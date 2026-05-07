@@ -1,0 +1,12 @@
+#!/bin/bash
+
+YAY_CACHE="${HOME}/.cache/yay"
+
+find "$YAY_CACHE" -mindepth 2 -maxdepth 2 \
+    ! -name "PKGBUILD" \
+    ! -name "*.install" \
+    ! -name "*.patch" \
+    -type f -delete
+
+find "$YAY_CACHE" -mindepth 2 -maxdepth 2 \
+    -type d -empty -delete
