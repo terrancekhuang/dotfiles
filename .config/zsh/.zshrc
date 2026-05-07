@@ -39,6 +39,9 @@ alias pa='$aurhelper -Ss'                                   # list available pac
 alias pc='$aurhelper -Sc'                                   # remove unused cache
 alias po='$aurhelper -Qtdq | $aurhelper -Rns -'             # remove unused packages
 
+# Interactive yay using fzf
+alias iyay="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
+
 # ============================================================================
 # File & Directory Aliases
 # ============================================================================
