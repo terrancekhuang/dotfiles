@@ -5,6 +5,8 @@ header="Accept: application/geo+json"
 cache_dir="$HOME/.cache/weather"
 location_cache="$cache_dir/location.json"
 points_cache="$cache_dir/points.json"
+forecast_cache="$cache_dir/forecast.json"
+obs_cache="$cache_dir/obs.json"
 no_cache=false
 
 for arg in "$@"; do
@@ -15,38 +17,50 @@ done
 
 mkdir -p "$cache_dir"
 
-tmp_forecast=$(mktemp)
-tmp_stations=$(mktemp)
-tmp_obs=$(mktemp)
-trap 'rm -f "$tmp_forecast" "$tmp_stations" "$tmp_obs"' EXIT
+trap 'rm -f "$tmp_stations"' EXIT
 
 cache_expired() {
     [[ ! -f "$1" || -n $(find "$1" -mtime +30 2>/dev/null) ]]
 }
 
+cache_expired_minutes() {
+    [[ ! -f "$1" || -n $(find "$1" -mmin +${2:-30} 2>/dev/null) ]]
+}
+
+# 1. Location (cached 30 days)
 if $no_cache || cache_expired "$location_cache"; then
-    curl -s ifconfig.co/json >"$location_cache"
+    curl -s --max-time 3 ifconfig.co/json >"$location_cache"
 fi
 latlong=$(jq -r '.latitude, .longitude' "$location_cache")
 IFS=$'\n' read -d '' -r latitude longitude <<<"$latlong"
 
+# 2. Points (cached 30 days)
 if $no_cache || cache_expired "$points_cache"; then
-    curl -s "$root/points/$latitude,$longitude" -H "$header" >"$points_cache"
+    curl -s --max-time 5 "$root/points/$latitude,$longitude" -H "$header" >"$points_cache"
 fi
 pointsResult=$(cat "$points_cache")
 
-obsStationsUrl=$(echo "$pointsResult" | jq -r '.properties.observationStations')
-forecastUrl=$(echo "$pointsResult" | jq -r '.properties.forecast + "?units=si"')
+obsStationsUrl=$(jq -r '.properties.observationStations' <<<"$pointsResult")
+forecastUrl=$(jq -r '.properties.forecast + "?units=si"' <<<"$pointsResult")
 
-curl -s "$forecastUrl" -H "$header" >"$tmp_forecast" &
-curl -s "$obsStationsUrl" -H "$header" >"$tmp_stations" &
+# 3. Forecast (cached 30 min)
+tmp_stations=$(mktemp)
+need_forecast=$($no_cache || cache_expired_minutes "$forecast_cache" 30 && echo true || echo false)
+
+if [[ $need_forecast == true ]]; then
+    curl -s --max-time 10 "$forecastUrl" -H "$header" >"$forecast_cache" &
+fi
+curl -s --max-time 10 "$obsStationsUrl" -H "$header" >"$tmp_stations" &
 wait
 
+# 4. Observation (cached 10 min)
 stationId=$(jq -r '.features[0].properties.stationIdentifier' "$tmp_stations")
-curl -s -H "$header" "$root/stations/$stationId/observations/latest" -o "$tmp_obs"
+if $no_cache || cache_expired_minutes "$obs_cache" 10; then
+    curl -s --max-time 10 -H "$header" "$root/stations/$stationId/observations/latest" >"$obs_cache"
+fi
 
-obsLatest=$(jq -r '.properties.temperature.value' "$tmp_obs")
-forecastDescription=$(jq -r '.properties.periods[0].detailedForecast' "$tmp_forecast")
+obsLatest=$(jq -r '.properties.temperature.value' "$obs_cache")
+forecastDescription=$(jq -r '.properties.periods[0].detailedForecast' "$forecast_cache")
 
 printf "%s°C\n" "$obsLatest" | fmt -w 80
 printf "%s\n" "$forecastDescription" | fmt -w 80
