@@ -56,6 +56,7 @@
 		"custom/left_div#7",
 		"custom/brightness",
 		"custom/left_inv#2",
+        "custom/notifications",
 		"custom/power_menu"
 	],
 
@@ -397,6 +398,24 @@
 		"on-click": "kitty -e ~/.config/waybar/scripts/power-menu.sh",
 		"tooltip-format": "Power Menu"
 	},
+
+    "custom/notifications": {
+        "exec": "~/.config/waybar/scripts/notifications.py",
+        "interval": 2,
+        "return-type": "json",
+        "format": "{icon} {text}",
+        "format-icons": {
+            "none":                 "󰂚",
+            "notification":         "󰂚",
+            "dnd":                  "󰂛",
+            "critical-notification": "󰂚"
+        },
+        "on-click": "dunstctl set-paused toggle",
+        "on-click-middle": "dunstctl history-clear",
+        "on-click-right": "dunstctl close-all",
+        "on-scroll-down": "dunstctl history-pop",
+        "tooltip-format": "Notifications"
+    },
 
 	/*-------------------
 		left dividers
