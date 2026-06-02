@@ -3,7 +3,7 @@
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(find ~/RIT ~/bible-books-tracker/ ~/increase-peace-productions/ -mindepth 1 -maxdepth 1 -type d | fzf)
+    selected=$(find ~/RIT ~/dev/personal/bible-books-tracker/ ~/dev/personal/algo-trading ~/dev/personal/increase-peace-productions/ -mindepth 1 -maxdepth 1 -type d | fzf)
 fi
 
 if [[ -z $selected ]]; then
