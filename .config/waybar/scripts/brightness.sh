@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# Waybar brightness module for external monitor via DDC/CI
+# Usage: brightness.sh [up|down|get]
+
 STEP=10
-BUS="2"
+BUS="2" # Your monitor is on /dev/i2c-2
 CACHE_FILE="/tmp/brightness_cache"
 LOCK_FILE="/tmp/brightness_cache.lock"
 SLEEP_MULT="0.1"
@@ -18,6 +21,17 @@ get_brightness() {
         grep -oP 'current value =\s*\K\d+' || echo "50")
     echo "$brightness" >"$CACHE_FILE"
     echo "$brightness"
+}
+
+get_icon() {
+    local brightness=$1
+    if [[ $brightness -lt 33 ]]; then
+        echo "󰃞"
+    elif [[ $brightness -lt 66 ]]; then
+        echo "󰃟"
+    else
+        echo "󰃠"
+    fi
 }
 
 set_brightness() {
@@ -38,9 +52,13 @@ set_brightness() {
         ddcutil --bus "$BUS" --sleep-multiplier "$SLEEP_MULT" setvcp 10 "$new_brightness" 2>/dev/null
     ) 9>"$LOCK_FILE" &
 
+    local icon
+    icon=$(get_icon "$new_brightness")
+
     notify-send -t 1000 \
         -h string:x-canonical-private-synchronous:brightness \
         -h int:value:"$new_brightness" \
+        -i "$icon" \
         "Brightness" "${new_brightness}%"
 }
 
@@ -55,7 +73,8 @@ case "$1" in
     ;;
 "get" | "")
     brightness=$(get_brightness)
-    echo "{\"text\":\"󰃞 ${brightness}%\", \"percentage\":${brightness}}"
+    icon=$(get_icon "$brightness")
+    echo "{\"text\":\"${icon} ${brightness}%\", \"percentage\":${brightness}}"
     ;;
 *)
     echo "Usage: $0 [up|down|get]"
