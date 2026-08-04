@@ -1,0 +1,21 @@
+# Configuration file for HyDE
+# Environment variables should be on top
+# Updated config.toml file can be found at $HOME/.local/share/hyde/config.toml
+"$schema" = "https://raw.githubusercontent.com/HyDE-Project/HyDE/refs/heads/master/Configs/.local/share/hyde/schema/config.toml.json"
+
+# Personal overrides. NOTE: as of this HyDE version, hyde.config.load_toml()
+# only reads the top-level [desktop] and [hyprland] tables, and merges them
+# flatly onto hyde.config (not into the nested hyde.config.ui.* that
+# variables.lua actually reads, and [hyprland-start] isn't read at all).
+# These entries match the documented schema in case that wiring lands later;
+# the values that are confirmed to actually take effect right now are set
+# directly in ~/.local/share/hypr/lua/variables.lua and start_up.lua.
+[hyprland]
+cursor_theme = "BreezeX-RosePine-Linux"
+
+[hyprland-start]
+bar = "waybar -c ~/.config/waybar/config.jsonc -s ~/.config/waybar/style.css"
+wallpaper = ""
+clipboard_persist = ""
+applet_network_manager = ""
+applet_bluetooth = ""
