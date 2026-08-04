@@ -7,60 +7,78 @@ VPN_GATEWAY="10.2.0.1"
 VPN_IFACE="proton0"
 COOKIE_FILE="/tmp/qbt_cookie.txt"
 
+log() { printf "%s: %s\n" "$(date)" "$*"; }
+warn() { printf "%s: WARNING: %s\n" "$(date)" "$*" >&2; }
+err() { printf "%s: ERROR: %s\n" "$(date)" "$*" >&2; }
+
 login_qbt() {
-    curl -s -c "$COOKIE_FILE" \
+    curl -sf -c "$COOKIE_FILE" \
         "$QBT_HOST/api/v2/auth/login" \
         -d "username=$QBT_USER&password=$QBT_PASS" >/dev/null
 }
 
 update_qbt_port() {
     local port=$1
-    curl -s -b "$COOKIE_FILE" \
+    if ! curl -sf -b "$COOKIE_FILE" \
         "$QBT_HOST/api/v2/app/setPreferences" \
-        -d "json={\"listen_port\": $port}" >/dev/null
-    echo "$(date): qBittorrent port set to $port"
+        -d "json={\"listen_port\": $port}" >/dev/null; then
+        warn "qBittorrent API call failed — attempting re-login"
+        login_qbt && curl -sf -b "$COOKIE_FILE" \
+            "$QBT_HOST/api/v2/app/setPreferences" \
+            -d "json={\"listen_port\": $port}" >/dev/null
+    fi
+    log "qBittorrent port set to $port"
 }
 
 update_ufw() {
     local new_port=$1
     local old_port=$2
 
-    # Remove old rules if port changed
     if [ -n "$old_port" ] && [ "$old_port" != "$new_port" ]; then
         sudo ufw delete allow in on "$VPN_IFACE" to any port "$old_port" proto tcp 2>/dev/null
         sudo ufw delete allow in on "$VPN_IFACE" to any port "$old_port" proto udp 2>/dev/null
-        echo "$(date): Removed UFW rules for old port $old_port"
+        log "Removed UFW rules for old port $old_port"
     fi
 
-    # Add new rules
     sudo ufw allow in on "$VPN_IFACE" to any port "$new_port" proto tcp
     sudo ufw allow in on "$VPN_IFACE" to any port "$new_port" proto udp
-    echo "$(date): Added UFW rules for port $new_port"
+    log "Added UFW rules for port $new_port"
 }
 
-login_qbt
+get_mapped_port() {
+    local proto=$1
+    natpmpc -a 1 0 "$proto" 60 -g "$VPN_GATEWAY" 2>&1 |
+        grep -oP 'Mapped public port \K\d+' |
+        head -1
+}
+
+login_qbt || {
+    err "Initial qBittorrent login failed"
+    exit 1
+}
+
 CURRENT_PORT=""
 
 while true; do
-    output=$(natpmpc -a 1 0 udp 60 -g "$VPN_GATEWAY" 2>&1 &&
-        natpmpc -a 1 0 tcp 60 -g "$VPN_GATEWAY" 2>&1)
+    UDP_PORT=$(get_mapped_port udp)
+    TCP_PORT=$(get_mapped_port tcp)
 
-    if [ $? -eq 0 ]; then
-        NEW_PORT=$(echo "$output" | grep -oP 'Mapped public port \K\d+' | head -1)
-
-        if [ -n "$NEW_PORT" ]; then
-            if [ "$NEW_PORT" != "$CURRENT_PORT" ]; then
-                echo "$(date): Port changed: $CURRENT_PORT -> $NEW_PORT"
-                update_ufw "$NEW_PORT" "$CURRENT_PORT"
-                update_qbt_port "$NEW_PORT"
-                CURRENT_PORT="$NEW_PORT"
-            fi
-        else
-            echo "$(date): WARNING: Could not parse port from natpmpc output" >&2
-        fi
-    else
-        printf "%s\nERROR with natpmpc command\n" "$(date)" >&2
+    if [ -z "$UDP_PORT" ] || [ -z "$TCP_PORT" ]; then
+        err "natpmpc failed or port could not be parsed (udp='$UDP_PORT' tcp='$TCP_PORT')"
         break
+    fi
+
+    if [ "$UDP_PORT" != "$TCP_PORT" ]; then
+        warn "UDP port ($UDP_PORT) and TCP port ($TCP_PORT) differ — using UDP port"
+    fi
+
+    NEW_PORT="$UDP_PORT"
+
+    if [ "$NEW_PORT" != "$CURRENT_PORT" ]; then
+        log "Port changed: ${CURRENT_PORT:-<none>} -> $NEW_PORT"
+        update_ufw "$NEW_PORT" "$CURRENT_PORT"
+        update_qbt_port "$NEW_PORT"
+        CURRENT_PORT="$NEW_PORT"
     fi
 
     sleep 45
