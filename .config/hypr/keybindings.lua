@@ -26,7 +26,7 @@ hl.bind(
 	hl.dsp.window.fullscreen(),
 	{ description = "[Window Management] toggle fullscreen" }
 )
-hl.bind(mainMod .. " + " .. "L", hl.dsp.exec_cmd("lockscreen.sh"), { description = "[Window Management] lock screen" })
+hl.bind(mainMod .. " + " .. "L", hl.dsp.exec_cmd("$HOME/.local/lib/hyde/lockscreen.sh"), { description = "[Window Management] lock screen" })
 hl.bind(
 	mainMod .. " + SHIFT" .. " + " .. "F",
 	hl.dsp.exec_cmd(hyde.sh.window.pin()),
