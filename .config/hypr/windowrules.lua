@@ -241,7 +241,7 @@ hl.window_rule({
 	match = {
 		class = "^([Ss]team)$",
 	},
-	opacity = "0.70 override 0.70 override 1",
+	opacity = "1.00 override 0.90 override 1",
 })
 
 hl.window_rule({
