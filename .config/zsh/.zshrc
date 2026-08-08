@@ -104,7 +104,7 @@ xournalpp() { command xournalpp "$@" &>/dev/null & disown; }
 # ============================================================================
 # Clipboard Management
 # ============================================================================
-alias ccb='wl-copy < /dev/null'                             # clear clipboard
+alias ccb='wl-copy --clear && wl-copy --clear --primary'    # clear clipboard
 
 # ============================================================================
 # SSH Agent
