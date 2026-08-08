@@ -67,6 +67,17 @@ hl.config({
 	},
 })
 
+hl.config({
+	general = {
+		gaps_in = 3,
+		gaps_out = 8,
+		col = {
+			active_border = { colors = { "rgba(bb9af7ff)", "rgba(b4f9f8ff)" }, angle = 45 },
+			inactive_border = { colors = { "rgba(565f89cc)", "rgba(9aa5cecc)" }, angle = 45 },
+		},
+	},
+})
+
 hl.env("HYPRCURSOR_THEME", "BreezeX-RosePine-Linux")
 
 hl.env("HYPRCURSOR_SIZE", 24)
