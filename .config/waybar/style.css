@@ -1,87 +1,65 @@
-@import "styles/modules-left.css";
-@import "styles/modules-center.css";
-@import "styles/modules-right.css";
-@import "theme.css";
-
 * {
-	font-family: "0xProto Nerd Font";
-	font-weight: bold;
-	font-size: 16px;
-	color: @main-fg;
+  border: none;
+  padding: 0 6px;
+  margin-top: 2px;
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 14px;
+}
+window#waybar { background: transparent; color: #ffffff; }
+
+#custom-ws1, #custom-ws2, #custom-ws3, #custom-ws4, #custom-ws5, #custom-ws6, #custom-ws7, #custom-ws8, #custom-ws9, #custom-ws10 {
+  background: transparent;
+  min-width: 18px;
+	padding-left: 2px;
+	color: #fff;
+}
+#custom-ws1.active,
+#custom-ws2.active,
+#custom-ws3.active,
+#custom-ws4.active,
+#custom-ws5.active,
+#custom-ws6.active,
+#custom-ws7.active,
+#custom-ws8.active,
+#custom-ws9.active,
+#custom-ws10.active
+{
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
 }
 
-/* main outline */
+#window, #tray, #clock { background: transparent;}
 
-window#waybar {
-	background-color: @outline;
+#tray {
+	margin-right: -5px;
 }
 
-/* main background */
-
-window#waybar > box {
-	margin: 4px;
-	background-color: @main-bg;
+#tray * {
+	padding-left: 0px;
+	padding-right: 0px;
 }
 
-/* hoverables */
-
-#custom-theme_switcher:hover,
-#idle_inhibitor:hover,
-#clock.date:hover,
-#network:hover,
-#bluetooth:hover,
-#custom-system_update:hover,
-#mpris:hover,
-#pulseaudio:hover,
-#wireplumber:hover {
-	color: @hover-fg;
+#tray menu {
+    padding: 5px 0;
+    margin: 0;
+	border: 1px solid #555;
 }
 
-/* states */
-
-.deactivated,
-.paused,
-#pulseaudio.output.muted,
-#pulseaudio.input.source-muted,
-#wireplumber.muted {
-	color: @hover-fg;
-}
-.warning { color: @warning; }
-.critical { color: @critical; }
-.charging { color: @charging; }
-
-/* dividers */
-
-#custom-left_div,
-#custom-left_inv,
-#custom-right_div,
-#custom-right_inv {
-	font-size: 23.1px;
+#tray menu menuitem {
+    padding: 4px 12px;
 }
 
-/* buttons */
-
-button {
-	border-radius: 16px;
-	padding: 0 10px;
+#tray menu menuitem:hover {
+    background: rgba(66,165,245,.25);
 }
-button:hover {
-	background-color: @hover-bg;
-	color: @hover-fg;
-}
-
-/* tooltips */
 
 tooltip {
-	border: 2px solid @main-br;
-	border-radius: 10px;
-	background-color: @main-bg;
+  background: rgba(30,30,30,0.95);
+  border: 1px solid #555;
+  border-radius: 6px;
 }
+
 tooltip label {
-	margin: 2px 4px;
-	font-weight: normal;
-}
-tooltip decoration {
-	border: none;
-	background-color: transparent;
+  color: #ffffff;
+  padding: 4px;
 }
