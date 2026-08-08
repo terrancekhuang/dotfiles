@@ -26,7 +26,11 @@ hl.bind(
 	hl.dsp.window.fullscreen(),
 	{ description = "[Window Management] toggle fullscreen" }
 )
-hl.bind(mainMod .. " + " .. "L", hl.dsp.exec_cmd("$HOME/.local/lib/hyde/lockscreen.sh"), { description = "[Window Management] lock screen" })
+hl.bind(
+	mainMod .. " + " .. "L",
+	hl.dsp.exec_cmd("$HOME/.local/lib/hyde/lockscreen.sh"),
+	{ description = "[Window Management] lock screen" }
+)
 hl.bind(
 	mainMod .. " + SHIFT" .. " + " .. "F",
 	hl.dsp.exec_cmd(hyde.sh.window.pin()),
@@ -78,14 +82,6 @@ hl.bind(
 	hl.dsp.focus({ direction = "down" }),
 	{ description = "[Window Management|Change focus] focus down" }
 )
-hl.bind(
-	"ALT" .. " + " .. "Tab",
-	hl.dsp.window.cycle_next(),
-	{ description = "[Window Management|Change focus] Cycle focus" }
-)
-hl.bind("ALT + TAB", hl.dsp.window.bring_to_top())
-hl.bind("ALT + SHIFT" .. " + " .. "TAB", hl.dsp.window.cycle_next({ next = false }))
-hl.bind("ALT + SHIFT + TAB", hl.dsp.window.bring_to_top())
 -- Resize windows
 hl.bind(
 	mainMod .. " + SHIFT" .. " + " .. "Right",
