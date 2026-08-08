@@ -62,7 +62,9 @@
         "max-length": 60,
         "rewrite": {
             "^$": "Desktop",
-            "^(kitty|zsh|~)$": "Terminal"
+            "^(kitty|zsh|~)$": "Terminal",
+            "(.*) — Mozilla Firefox": "$1",
+            "^Mozilla Firefox$": "Firefox",
         }
     },
 	"tray": { "icon-size": 16, "spacing": 10 },
