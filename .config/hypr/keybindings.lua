@@ -54,7 +54,7 @@ hl.bind(
 -- toggle waybar without reloading, this is faster
 hl.bind(
 	mainMod .. " + CONTROL" .. " + " .. "H",
-	hl.dsp.group.next({ forward = false }),
+	hl.dsp.group.prev(),
 	{ description = "[Window Management|Group Navigation] change active group backwards" }
 )
 hl.bind(
@@ -567,4 +567,10 @@ hl.bind(
 	mainMod .. " + ALT" .. " + " .. 0,
 	hl.dsp.window.move({ workspace = 10 }, { follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 10 (silent)" }
+)
+
+hl.bind(
+	mainMod .. " + SHIFT + M",
+	hl.dsp.exec_cmd("~/.local/bin/spotify-notify.sh"),
+	{ description = "[Media|Spotify] show now-playing notification" }
 )
