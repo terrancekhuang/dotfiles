@@ -24,10 +24,21 @@ KEYTIMEOUT=1
 # ============================================================================
 
 # Zoxide (better cd)
-eval "$(zoxide init zsh)"
+# Regenerate cache if missing or older than the binary
+zoxide_cache="$HOME/.cache/zsh/zoxide.zsh"
+if [[ ! -f "$zoxide_cache" || "$(command -v zoxide)" -nt "$zoxide_cache" ]]; then
+  mkdir -p "$(dirname "$zoxide_cache")"
+  zoxide init zsh > "$zoxide_cache"
+fi
+source "$zoxide_cache"
 
 # fzf integration
-source <(fzf --zsh)
+fzf_cache="$HOME/.cache/zsh/fzf.zsh"
+if [[ ! -f "$fzf_cache" || "$(command -v fzf)" -nt "$fzf_cache" ]]; then
+  mkdir -p "$(dirname "$fzf_cache")"
+  fzf --zsh > "$fzf_cache"
+fi
+source "$fzf_cache"
 
 # ============================================================================
 # System & Package Management Aliases
@@ -110,14 +121,20 @@ alias ccb='wl-copy --clear && wl-copy --clear --primary'    # clear clipboard
 # SSH Agent
 # ============================================================================
 # Start ssh agent automatically
-if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+if [[ ! -S "$SSH_AUTH_SOCK" ]]; then
+  if ! pgrep -u "$USER" ssh-agent > /dev/null; then
     ssh-agent -t 1h > "$XDG_RUNTIME_DIR/ssh-agent.env"
-fi
-if [ ! -f "$SSH_AUTH_SOCK" ]; then
-    source "$XDG_RUNTIME_DIR/ssh-agent.env" >/dev/null
+  fi
+  source "$XDG_RUNTIME_DIR/ssh-agent.env" >/dev/null
 fi
 
 export PATH="$HOME/.local/bin/verse:$PATH"
 
-# Node NVM
-source /usr/share/nvm/init-nvm.sh
+# Node NVM lazy load
+export NVM_DIR="$HOME/.nvm"
+
+nvm() {
+  unfunction nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  nvm "$@"
+}
