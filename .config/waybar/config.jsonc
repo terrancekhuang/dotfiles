@@ -65,7 +65,7 @@
             "^(kitty|zsh|~)$": "Terminal",
             "(.*) — Mozilla Firefox": "$1",
             "^Mozilla Firefox$": "Firefox",
-            "(.*):(.*)": "󰆍 $1:$2"
+            "(.*):(.*)": "$1:$2"
         }
     },
 	"tray": { "icon-size": 16, "spacing": 10 },
