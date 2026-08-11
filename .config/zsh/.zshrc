@@ -118,3 +118,6 @@ if [ ! -f "$SSH_AUTH_SOCK" ]; then
 fi
 
 export PATH="$HOME/.local/bin/verse:$PATH"
+
+# Node NVM
+source /usr/share/nvm/init-nvm.sh
