@@ -2,7 +2,7 @@ return {
   "MeanderingProgrammer/render-markdown.nvim",
   opts = {
     checkbox = {
-      enabled = true,
+      enabled = false,
     },
     latex = {
       enabled = false,
