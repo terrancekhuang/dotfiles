@@ -24,6 +24,11 @@ return {
       inlay_hints = {
         enabled = false,
       },
+      diagnostics = {
+        underline = true,
+        virtual_text = false,
+        signs = false,
+      },
       servers = {
         lua_ls = {},
         ts_ls = {},
