@@ -1,8 +1,7 @@
 return {
   {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "tokyonight-moon",
-    },
+    "catppuccin/nvim",
+    name = "catppuccin-mocha",
+    priority = 1000,
   },
 }
