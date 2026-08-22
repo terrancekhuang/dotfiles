@@ -319,51 +319,6 @@ hl.bind(
 	{ locked = true, description = "[Utilities|Screen Capture] print all monitors" }
 )
 hl.bind(
-	mainMod .. " + ALT" .. " + " .. "Right",
-	hl.dsp.exec_cmd("$HOME/.local/lib/hyde/wallpaper.sh -Gn"),
-	{ description = "[Theming and Wallpaper] next global wallpaper" }
-)
-hl.bind(
-	mainMod .. " + ALT" .. " + " .. "Left",
-	hl.dsp.exec_cmd("$HOME/.local/lib/hyde/wallpaper.sh -Gp"),
-	{ description = "[Theming and Wallpaper] previous global wallpaper" }
-)
-hl.bind(
-	mainMod .. " + SHIFT" .. " + " .. "W",
-	hl.dsp.exec_cmd("pkill -x rofi || $HOME/.local/lib/hyde/wallpaper.sh -SG"),
-	{ description = "[Theming and Wallpaper] select a global wallpaper" }
-)
-hl.bind(
-	mainMod .. " + ALT" .. " + " .. "Up",
-	hl.dsp.exec_cmd("hyde-shell waybar --next"),
-	{ description = "[Theming and Wallpaper] next waybar layout" }
-)
-hl.bind(
-	mainMod .. " + ALT" .. " + " .. "Down",
-	hl.dsp.exec_cmd("hyde-shell waybar --prev"),
-	{ description = "[Theming and Wallpaper] previous waybar layout" }
-)
-hl.bind(
-	mainMod .. " + SHIFT" .. " + " .. "M",
-	hl.dsp.exec_cmd("pkill -x rofi || $HOME/.local/lib/hyde/wallbashtoggle.sh -m"),
-	{ description = "[Theming and Wallpaper] wallbash mode selector" }
-)
-hl.bind(
-	mainMod .. " + SHIFT" .. " + " .. "T",
-	hl.dsp.exec_cmd(hyde.sh.menu.themes()),
-	{ description = "[Theming and Wallpaper] select a theme" }
-)
-hl.bind(
-	mainMod .. "+SHIFT" .. " + " .. "Y",
-	hl.dsp.exec_cmd("hyde-shell animations --select"),
-	{ description = "[Theming and Wallpaper] select animations" }
-)
-hl.bind(
-	mainMod .. "+SHIFT" .. " + " .. "U",
-	hl.dsp.exec_cmd("pkill -x rofi || $HOME/.local/lib/hyde/hyprlock.sh --select"),
-	{ description = "[Theming and Wallpaper] select hyprlock layout" }
-)
-hl.bind(
 	mainMod .. " + " .. 1,
 	hl.dsp.focus({ workspace = 1 }),
 	{ description = "[Workspaces|Navigation] navigate to workspace 1" }
