@@ -59,20 +59,16 @@ if $no_cache || cache_expired_minutes "$obs_cache" 10; then
     curl -s --max-time 10 -H "$header" "$root/stations/$stationId/observations/latest" >"$obs_cache"
 fi
 
-obsLatest=$(jq -r '.properties.temperature.value' "$obs_cache")
-if [[ $obsLatest == "null" ]]; then
-    # NWS sometimes nulls a QC-flagged field even though the raw METAR
-    # still carries the reading (e.g. temperature qualityControl "Z").
-    # Fall back to parsing the METAR temperature group (TsTTTsTdTdTd).
-    rawMessage=$(jq -r '.properties.rawMessage' "$obs_cache")
-    if [[ $rawMessage =~ T([01])([0-9]{3})[01][0-9]{3} ]]; then
-        sign=${BASH_REMATCH[1]}
-        tenths=${BASH_REMATCH[2]}
-        tenths=$((10#$tenths))
-        [[ $sign == 1 ]] && tenths=$((-tenths))
-        obsLatest=$(awk -v t="$tenths" 'BEGIN { printf "%.1f", t / 10 }')
-    fi
-fi
+# NWS sometimes nulls a QC-flagged field even though the raw METAR still
+# carries the reading (e.g. temperature qualityControl "Z"); fall back to
+# the METAR temperature group (TsTTTsTdTdTd) in that case.
+obsLatest=$(jq -r '
+    .properties.temperature.value //
+    ( .properties.rawMessage
+    | capture("T(?<sign>[01])(?<tenths>[0-9]{3})[01][0-9]{3}")
+    | (if .sign == "1" then -1 else 1 end) * (.tenths | tonumber) / 10
+    ) // "null"
+' "$obs_cache")
 forecastDescription=$(jq -r '.properties.periods[0].detailedForecast' "$forecast_cache")
 
 printf "%s°C\n" "$obsLatest" | fmt -w 80
