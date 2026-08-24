@@ -60,6 +60,19 @@ if $no_cache || cache_expired_minutes "$obs_cache" 10; then
 fi
 
 obsLatest=$(jq -r '.properties.temperature.value' "$obs_cache")
+if [[ $obsLatest == "null" ]]; then
+    # NWS sometimes nulls a QC-flagged field even though the raw METAR
+    # still carries the reading (e.g. temperature qualityControl "Z").
+    # Fall back to parsing the METAR temperature group (TsTTTsTdTdTd).
+    rawMessage=$(jq -r '.properties.rawMessage' "$obs_cache")
+    if [[ $rawMessage =~ T([01])([0-9]{3})[01][0-9]{3} ]]; then
+        sign=${BASH_REMATCH[1]}
+        tenths=${BASH_REMATCH[2]}
+        tenths=$((10#$tenths))
+        [[ $sign == 1 ]] && tenths=$((-tenths))
+        obsLatest=$(awk -v t="$tenths" 'BEGIN { printf "%.1f", t / 10 }')
+    fi
+fi
 forecastDescription=$(jq -r '.properties.periods[0].detailedForecast' "$forecast_cache")
 
 printf "%s°C\n" "$obsLatest" | fmt -w 80
