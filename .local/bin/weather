@@ -19,35 +19,32 @@ mkdir -p "$cache_dir"
 
 trap 'rm -f "$tmp_stations"' EXIT
 
-cache_expired() {
-    [[ ! -f "$1" || -n $(find "$1" -mtime +30 2>/dev/null) ]]
-}
-
 cache_expired_minutes() {
     [[ ! -f "$1" || -n $(find "$1" -mmin +${2:-30} 2>/dev/null) ]]
+}
+
+cache_expired() {
+    cache_expired_minutes "$1" $((30 * 1440))
 }
 
 # 1. Location (cached 30 days)
 if $no_cache || cache_expired "$location_cache"; then
     curl -s --max-time 3 ifconfig.co/json >"$location_cache"
 fi
-latlong=$(jq -r '.latitude, .longitude' "$location_cache")
-IFS=$'\n' read -d '' -r latitude longitude <<<"$latlong"
+IFS=$'\t' read -r latitude longitude < <(jq -r '[.latitude, .longitude] | @tsv' "$location_cache")
 
 # 2. Points (cached 30 days)
 if $no_cache || cache_expired "$points_cache"; then
     curl -s --max-time 5 "$root/points/$latitude,$longitude" -H "$header" >"$points_cache"
 fi
-pointsResult=$(cat "$points_cache")
-
-obsStationsUrl=$(jq -r '.properties.observationStations' <<<"$pointsResult")
-forecastUrl=$(jq -r '.properties.forecast + "?units=si"' <<<"$pointsResult")
+IFS=$'\t' read -r obsStationsUrl forecastUrl < <(jq -r '
+    [.properties.observationStations, (.properties.forecast + "?units=si")] | @tsv
+' "$points_cache")
 
 # 3. Forecast (cached 30 min)
 tmp_stations=$(mktemp)
-need_forecast=$($no_cache || cache_expired_minutes "$forecast_cache" 30 && echo true || echo false)
 
-if [[ $need_forecast == true ]]; then
+if $no_cache || cache_expired_minutes "$forecast_cache" 30; then
     curl -s --max-time 10 "$forecastUrl" -H "$header" >"$forecast_cache" &
 fi
 curl -s --max-time 10 "$obsStationsUrl" -H "$header" >"$tmp_stations" &
@@ -64,7 +61,7 @@ fi
 # the METAR temperature group (TsTTTsTdTdTd) in that case.
 obsLatest=$(jq -r '
     .properties.temperature.value //
-    ( .properties.rawMessage
+    ( (.properties.rawMessage // "")
     | capture("T(?<sign>[01])(?<tenths>[0-9]{3})[01][0-9]{3}")
     | (if .sign == "1" then -1 else 1 end) * (.tenths | tonumber) / 10
     ) // "null"
