@@ -1,22 +1,9 @@
 return {
   {
-    "mason-org/mason.nvim",
-    lazy = false,
-    config = function()
-      require("mason").setup()
-    end,
-  },
-  {
     "mason-org/mason-lspconfig.nvim",
-    lazy = false,
     opts = {
-      auto_install = true,
+      ensure_installed = { "lua_ls" },
     },
-    config = function()
-      require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "ts_ls" },
-      })
-    end,
   },
   {
     "neovim/nvim-lspconfig",
@@ -31,7 +18,6 @@ return {
       },
       servers = {
         lua_ls = {},
-        ts_ls = {},
         ["*"] = {
           capabilities = {
             workspace = {
