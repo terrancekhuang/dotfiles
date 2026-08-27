@@ -611,6 +611,48 @@ hl.window_rule({
 	no_initial_focus = true,
 })
 
+hl.window_rule({
+	name = "signal_workspace",
+	match = { class = "^(signal)$" },
+	workspace = "4 silent",
+})
+
+hl.window_rule({
+	name = "zapzap_workspace",
+	match = { class = "^(com.rtosta.zapzap)$" },
+	workspace = "4 silent",
+})
+
+hl.window_rule({
+	name = "android_messages_workspace",
+	match = { class = "^(pw.kmr.amd)$" },
+	workspace = "4 silent",
+})
+
+hl.window_rule({
+	name = "betterbird_workspace",
+	match = { class = "^(eu.betterbird.Betterbird)$" },
+	workspace = "5 silent",
+})
+
+hl.window_rule({
+	name = "spotify_workspace",
+	match = { class = "^([Ss]potify)$" },
+	workspace = "6 silent",
+})
+
+hl.window_rule({
+	name = "steam_workspace",
+	match = { class = "^([Ss]team)$" },
+	workspace = "7 silent",
+})
+
+hl.window_rule({
+	name = "heroic_workspace",
+	match = { class = "^([Hh]eroic)$" },
+	workspace = "7 silent",
+})
+
 -- █░░ ▄▀█ █▄█ █▀▀ █▀█   █▀█ █░█ █░░ █▀▀ █▀
 
 -- █▄▄ █▀█ ░█░ ██▄ █▀▄   █▀▄ █▄█ █▄▄ ██▄ ▄█
