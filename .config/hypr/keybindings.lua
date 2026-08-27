@@ -295,17 +295,14 @@ hl.bind(
 	hl.dsp.exec_cmd("hyprpicker -an"),
 	{ description = "[Utilities|Screen Capture] color picker" }
 )
--- bindd = $mainMod, P, $d snip screen , exec, $HOME/.local/lib/hyde/screenshot.sh s # partial screenshot capture
 hl.bind(
 	mainMod .. " + " .. "P",
-	hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'),
-	{ description = "[Utilities|Screen Capture] snip screen" }
+	hl.dsp.exec_cmd("flameshot gui --accept-on-select --clipboard"),
+	{ description = "[Utilities|Screen Capture] snip screen to clipboard" }
 )
 hl.bind(
 	mainMod .. " + CONTROL" .. " + " .. "P",
-	hl.dsp.exec_cmd(
-		"slurp | grim -g - - | tee ~/Pictures/Screenshots/$(date -Iminutes | sed 's/[-T:]//g' | cut -c-12).png | wl-copy"
-	),
+	hl.dsp.exec_cmd("flameshot gui --path $HOME/Pictures/Screenshots"),
 	{ description = "[Utilities|Screen Capture] snip screen and save to Pictures dir" }
 )
 hl.bind(
@@ -315,8 +312,8 @@ hl.bind(
 )
 hl.bind(
 	"Print",
-	hl.dsp.exec_cmd("$HOME/.local/lib/hyde/screenshot.sh p"),
-	{ locked = true, description = "[Utilities|Screen Capture] print all monitors" }
+	hl.dsp.exec_cmd("flameshot gui --region all"),
+	{ locked = true, description = "[Utilities|Screen Capture] screenshot whole monitor into editor" }
 )
 hl.bind(
 	mainMod .. " + " .. 1,
