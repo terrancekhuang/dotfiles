@@ -82,6 +82,11 @@ hl.env("HYPRCURSOR_THEME", "BreezeX-RosePine-Linux")
 
 hl.env("HYPRCURSOR_SIZE", 24)
 
+-- XWayland / X11 apps use the legacy Xcursor theme
+hl.env("XCURSOR_THEME", "BreezeX-RosePine-Linux")
+
+hl.env("XCURSOR_SIZE", 24)
+
 -- Autostart
 hl.on("hyprland.start", function()
 	hl.exec_cmd('hyprctl setcursor "BreezeX-RosePine-Linux" 24')
