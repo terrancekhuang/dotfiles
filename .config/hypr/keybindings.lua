@@ -302,7 +302,7 @@ hl.bind(
 )
 hl.bind(
 	mainMod .. " + CONTROL" .. " + " .. "P",
-	hl.dsp.exec_cmd("flameshot gui --path $HOME/Pictures/Screenshots"),
+	hl.dsp.exec_cmd("flameshot gui"),
 	{ description = "[Utilities|Screen Capture] snip screen and save to Pictures dir" }
 )
 hl.bind(
