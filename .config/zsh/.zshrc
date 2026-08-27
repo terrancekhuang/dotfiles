@@ -112,6 +112,9 @@ darktable() { command darktable "$@" &>/dev/null & disown; }
 okular() { command okular "$@" &>/dev/null & disown; }
 xournalpp() { command xournalpp "$@" &>/dev/null & disown; }
 
+# Betterbird
+alias betterbird='GDK_BACKEND=x11 betterbird'
+
 # ============================================================================
 # Clipboard Management
 # ============================================================================
