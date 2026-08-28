@@ -1,73 +1,96 @@
 {
-	"layer": "top",
-	"position": "top",
-
-	"modules-left":   [ "custom/ws1", "custom/ws2", "custom/ws3", "custom/ws4","custom/ws5","custom/ws6","custom/ws7","custom/ws8","custom/ws9","custom/ws10"],
-	"modules-center": [ "hyprland/window" ],
-	"modules-right": [ "tray", "idle_inhibitor", "custom/separator", "network", "bluetooth", "custom/separator", "disk", "cpu", "memory", "pulseaudio", "custom/separator", "clock"],
-
-	"custom/ws1": {
-		"exec": "~/.config/waybar/scripts/workspace.sh 1",
-		"exec-persistent": true,
-		"return-type": "json",
-		"on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"1\" }))'"
-	},
-	"custom/ws2": {
-		"exec": "~/.config/waybar/scripts/workspace.sh 2",
-		"exec-persistent": true,
-		"return-type": "json",
-		"on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"2\" }))'"
-	},
-	"custom/ws3": {
-		"exec": "~/.config/waybar/scripts/workspace.sh 3",
-		"exec-persistent": true,
-		"return-type": "json",
-		"on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"3\" }))'"
-	},
-	"custom/ws4": {
-		"exec": "~/.config/waybar/scripts/workspace.sh 4",
-		"exec-persistent": true,
-		"return-type": "json",
-		"on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"4\" }))'"
-	},
-	"custom/ws5": {
-		"exec": "~/.config/waybar/scripts/workspace.sh 5",
-		"exec-persistent": true,
-		"return-type": "json",
-		"on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"5\" }))'"
-	},
-	"custom/ws6": {
-		"exec": "~/.config/waybar/scripts/workspace.sh 6",
-		"exec-persistent": true,
-		"return-type": "json",
-		"on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"6\" }))'"
-	},
-	"custom/ws7": {
-		"exec": "~/.config/waybar/scripts/workspace.sh 7",
-		"exec-persistent": true,
-		"return-type": "json",
-		"on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"7\" }))'"
-	},
-	"custom/ws8": {
-		"exec": "~/.config/waybar/scripts/workspace.sh 8",
-		"exec-persistent": true,
-		"return-type": "json",
-		"on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"8\" }))'"
-	},
-	"custom/ws9": {
-		"exec": "~/.config/waybar/scripts/workspace.sh 9",
-		"exec-persistent": true,
-		"return-type": "json",
-		"on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"9\" }))'"
-	},
-	"custom/ws10": {
-		"exec": "~/.config/waybar/scripts/workspace.sh 10",
-		"exec-persistent": true,
-		"return-type": "json",
-		"on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"10\" }))'"
-	},
-
-	"hyprland/window": {
+    "layer": "top",
+    "position": "top",
+    "modules-left": [
+        "custom/ws1",
+        "custom/ws2",
+        "custom/ws3",
+        "custom/ws4",
+        "custom/ws5",
+        "custom/ws6",
+        "custom/ws7",
+        "custom/ws8",
+        "custom/ws9",
+        "custom/ws10"
+    ],
+    "modules-center": [
+        "hyprland/window"
+    ],
+    "modules-right": [
+        "tray",
+        "idle_inhibitor",
+        "custom/separator",
+        "network",
+        "bluetooth",
+        "custom/separator",
+        "disk",
+        "cpu",
+        "memory",
+        "pulseaudio",
+        "custom/separator",
+        "clock"
+    ],
+    "custom/ws1": {
+        "exec": "~/.config/waybar/scripts/workspace.sh 1",
+        "exec-persistent": true,
+        "return-type": "json",
+        "on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"1\" }))'"
+    },
+    "custom/ws2": {
+        "exec": "~/.config/waybar/scripts/workspace.sh 2",
+        "exec-persistent": true,
+        "return-type": "json",
+        "on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"2\" }))'"
+    },
+    "custom/ws3": {
+        "exec": "~/.config/waybar/scripts/workspace.sh 3",
+        "exec-persistent": true,
+        "return-type": "json",
+        "on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"3\" }))'"
+    },
+    "custom/ws4": {
+        "exec": "~/.config/waybar/scripts/workspace.sh 4",
+        "exec-persistent": true,
+        "return-type": "json",
+        "on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"4\" }))'"
+    },
+    "custom/ws5": {
+        "exec": "~/.config/waybar/scripts/workspace.sh 5",
+        "exec-persistent": true,
+        "return-type": "json",
+        "on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"5\" }))'"
+    },
+    "custom/ws6": {
+        "exec": "~/.config/waybar/scripts/workspace.sh 6",
+        "exec-persistent": true,
+        "return-type": "json",
+        "on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"6\" }))'"
+    },
+    "custom/ws7": {
+        "exec": "~/.config/waybar/scripts/workspace.sh 7",
+        "exec-persistent": true,
+        "return-type": "json",
+        "on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"7\" }))'"
+    },
+    "custom/ws8": {
+        "exec": "~/.config/waybar/scripts/workspace.sh 8",
+        "exec-persistent": true,
+        "return-type": "json",
+        "on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"8\" }))'"
+    },
+    "custom/ws9": {
+        "exec": "~/.config/waybar/scripts/workspace.sh 9",
+        "exec-persistent": true,
+        "return-type": "json",
+        "on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"9\" }))'"
+    },
+    "custom/ws10": {
+        "exec": "~/.config/waybar/scripts/workspace.sh 10",
+        "exec-persistent": true,
+        "return-type": "json",
+        "on-click": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"10\" }))'"
+    },
+    "hyprland/window": {
         "format": "{title}",
         "max-length": 60,
         "rewrite": {
@@ -78,93 +101,84 @@
             "(.*):(.*)": "$1:$2"
         }
     },
-	"tray": { "icon-size": 16, "spacing": 10 },
-
-	"pulseaudio": {
-		"scroll-step": 1,
-		"max-volume": 100,
-		"on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
-		"on-click-right": "pavucontrol",
-
-		"markup": "pango",
-		"format":  "<span color='#e5c07b'>{icon} </span> <span color='#ffffff'>{volume}%</span>",
-		"format-muted": "<span color='#e5c07b'>󰖁 </span> muted",
-
-		"format-icons": {
-			"default": "󰕾",
-			"muted":   "󰖁",
-			"headphones": "󰋋"
-		}
-	},
-
-	"custom/separator": {
-		"exec": "echo '{\"text\":\"|\"}'",
-		"return-type": "json",
-		"format": "<span color='#555'>{text}</span>",
-		"markup": "pango",
-		"interval": 3600
-	},
-
+    "tray": {
+        "icon-size": 16,
+        "spacing": 10
+    },
+    "pulseaudio": {
+        "scroll-step": 1,
+        "max-volume": 100,
+        "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+        "on-click-right": "pavucontrol",
+        "markup": "pango",
+        "format": "<span color='#e5c07b'>{icon} </span> <span color='#ffffff'>{volume}%</span>",
+        "format-muted": "<span color='#e5c07b'>󰖁 </span> muted",
+        "format-icons": {
+            "default": "󰕾",
+            "muted": "󰖁",
+            "headphones": "󰋋"
+        }
+    },
+    "custom/separator": {
+        "exec": "echo '{\"text\":\"|\"}'",
+        "return-type": "json",
+        "format": "<span color='#555'>{text}</span>",
+        "markup": "pango",
+        "interval": 3600
+    },
     "idle_inhibitor": {
-		"format": "{icon}",
-		"format-icons": {
-			"activated": "󰈈",
-			"deactivated": "󰈉"
-		},
-		"min-length": 3,
-		"max-length": 3,
-		"tooltip-format-activated": "Keep Screen On: <span text_transform='capitalize'>{status}</span>",
-		"tooltip-format-deactivated": "Keep Screen On: <span text_transform='capitalize'>{status}</span>",
-		"start-activated": false
-	},
-
-	"cpu": {
-		"interval": 1,
-		"markup": "pango",
-		"format": "<span color='#E06C75'> </span> {usage}%"
-	},
-
-	"memory": {
-		"interval": 2,
-		"markup": "pango",
-		"format": "<span color='#98C379'> </span> {percentage}%"
-	},
-
-	"disk": {
-		"interval": 30,
-		"path": "/",
-		"markup": "pango",
-		"format": "<span color='#C678DD'>󰋊 </span> {percentage_used}%"
-	},
-
-	"clock": {
-		"interval": 1,
-		"format":      "{:%Y-%m-%d  %H:%M:%S}",
-		"tooltip": false
-	},
-
-	"network": {
-		"interface": ["enp.*", "eth.*"],
-		"interval": 3,
-		"markup": "pango",
-
-		"format-ethernet":    "<span color='#61AFEF'>󰈀 </span> up",
-		"format-wifi":        "<span color='#61AFEF'>󰖩 </span> {essid}",
-		"format-unknown":     "<span color='#61AFEF'>󰈂 </span> up",
-		"format-disconnected":"<span color='#E06C75'>󰖪 </span> down",
-
-		"on-click": "nm-connection-editor"
-	},
-
-	"bluetooth": {
-		"interval": 5,
-		"markup": "pango",
-
-		"format":           "<span color='#5C6370'>󰂯 </span>disconnected",
-		"format-off":  "<span color='#5C6370'>󰂯 </span>power off",
-		"format-no-controller":  "<span color='#5C6370'>󰂯 </span>disabled",
-		"format-connected": "<span color='#61AFEF'>󰂯 </span>connected",
-
-		"on-click": "blueman-manager"
-	}
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "󰈈",
+            "deactivated": "󰈉"
+        },
+        "min-length": 3,
+        "max-length": 3,
+        "tooltip-format-activated": "Keep Screen On: <span text_transform='capitalize'>{status}</span>",
+        "tooltip-format-deactivated": "Keep Screen On: <span text_transform='capitalize'>{status}</span>",
+        "start-activated": false
+    },
+    "cpu": {
+        "interval": 1,
+        "markup": "pango",
+        "format": "<span color='#E06C75'> </span> {usage}%"
+    },
+    "memory": {
+        "interval": 2,
+        "markup": "pango",
+        "format": "<span color='#98C379'> </span> {percentage}%"
+    },
+    "disk": {
+        "interval": 30,
+        "path": "/",
+        "markup": "pango",
+        "format": "<span color='#C678DD'>󰋊 </span> {percentage_used}%"
+    },
+    "clock": {
+        "interval": 1,
+        "format": "{:%a %b %d  %H:%M:%S}",
+        "tooltip": false
+    },
+    "network": {
+        "interface": [
+            "enp.*",
+            "eth.*"
+        ],
+        "interval": 3,
+        "markup": "pango",
+        "format-ethernet": "<span color='#61AFEF'>󰈀 </span> up",
+        "format-wifi": "<span color='#61AFEF'>󰖩 </span> {essid}",
+        "format-unknown": "<span color='#61AFEF'>󰈂 </span> up",
+        "format-disconnected": "<span color='#E06C75'>󰖪 </span> down",
+        "on-click": "nm-connection-editor"
+    },
+    "bluetooth": {
+        "interval": 5,
+        "markup": "pango",
+        "format": "<span color='#5C6370'>󰂯 </span>disconnected",
+        "format-off": "<span color='#5C6370'>󰂯 </span>power off",
+        "format-no-controller": "<span color='#5C6370'>󰂯 </span>disabled",
+        "format-connected": "<span color='#61AFEF'>󰂯 </span>connected",
+        "on-click": "blueman-manager"
+    }
 }
