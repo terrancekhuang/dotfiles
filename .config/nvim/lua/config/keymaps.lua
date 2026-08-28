@@ -24,6 +24,10 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 -- Unindent with shift tab
 vim.keymap.set("i", "<S-Tab>", "<C-d>", opts)
 
+vim.keymap.set("n", "<leader>yp", function()
+  vim.fn.setreg("+", vim.fn.expand("%:p"))
+end, { desc = "Copy full file path to clipboard" })
+
 -- When in character-wise or block-wise visual mode,
 -- substitute only within exact bounds
 vim.keymap.set("v", ":s", function()
