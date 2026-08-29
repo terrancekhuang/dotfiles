@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+# Apply a forwarded port everywhere it needs to go:
+#   1. UFW rules on the VPN interface (open the new port, close any stale ones)
+#   2. qBittorrent / qbittorrent-nox listen port, via the WebUI API
+#
+# Usage: set_torrent_port <port>
+#
+# One port per invocation. Typically fed by get_torrent_port:
+#     get_torrent_port | while read -r p; do set_torrent_port "$p"; done
+#
+# Needs sudo for the UFW step. Exits non-zero if qBittorrent is unreachable
+# (the UFW rules are still updated first — the safe direction).
+
+QBT_HOST="http://localhost:8080"
+QBT_USER="admin"
+QBT_PASS=$(cat ~/.config/qbt_pass)
+COOKIE_FILE="/tmp/qbt_cookie.txt"
+VPN_IFACE="proton0"
+
+log()  { printf "%s: %s\n" "$(date)" "$*"; }
+warn() { printf "%s: WARNING: %s\n" "$(date)" "$*" >&2; }
+err()  { printf "%s: ERROR: %s\n" "$(date)" "$*" >&2; }
+
+NEW_PORT=$1
+
+if ! [[ "$NEW_PORT" =~ ^[0-9]+$ ]] || [ "$NEW_PORT" -lt 1 ] || [ "$NEW_PORT" -gt 65535 ]; then
+    err "invalid port '${NEW_PORT}' (usage: set_torrent_port <port>)"
+    exit 2
+fi
+
+update_ufw() {
+    local new_port=$1 num
+
+    sudo ufw allow in on "$VPN_IFACE" to any port "$new_port" proto tcp
+    sudo ufw allow in on "$VPN_IFACE" to any port "$new_port" proto udp
+    log "Added UFW rules for port $new_port"
+
+    # Prune every other `on proton0` rule. Delete by number (reliable regardless
+    # of how the rule was originally added); numbers shift after each delete, so
+    # re-query and take the first match until none remain.
+    while num=$(sudo ufw status numbered |
+        grep -P " on ${VPN_IFACE}\b" |
+        grep -vP "\]\s+${new_port}/(tcp|udp)" |
+        grep -oP '^\[\s*\K[0-9]+' | head -1); [ -n "$num" ]; do
+        if sudo ufw --force delete "$num" >/dev/null; then
+            log "Removed stale UFW rule #$num on $VPN_IFACE"
+        else
+            warn "failed to delete UFW rule #$num — stopping prune to avoid a loop"
+            break
+        fi
+    done
+}
+
+login_qbt() {
+    curl -sf -c "$COOKIE_FILE" \
+        "$QBT_HOST/api/v2/auth/login" \
+        -d "username=$QBT_USER&password=$QBT_PASS" >/dev/null
+}
+
+set_qbt_port() {
+    curl -sf -b "$COOKIE_FILE" \
+        "$QBT_HOST/api/v2/app/setPreferences" \
+        -d "json={\"listen_port\": $1}" >/dev/null
+}
+
+update_ufw "$NEW_PORT"
+
+login_qbt || {
+    err "qBittorrent login failed ($QBT_HOST)"
+    exit 1
+}
+
+if ! set_qbt_port "$NEW_PORT"; then
+    warn "qBittorrent API call failed — attempting re-login"
+    if ! { login_qbt && set_qbt_port "$NEW_PORT"; }; then
+        err "failed to set qBittorrent port to $NEW_PORT"
+        exit 1
+    fi
+fi
+
+log "qBittorrent port set to $NEW_PORT"

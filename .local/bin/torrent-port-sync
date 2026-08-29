@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# Long-running bridge: feed forwarded-port changes from get_torrent_port into
+# set_torrent_port (which updates the UFW rules and the qBittorrent listen port).
+#
+# Runs as the systemd --user service torrent-port-forward.service, which is bound
+# to qbittorrent-nox.service (starts/stops/restarts together). Not normally run
+# by hand.
+
+QBT_URL="http://localhost:8080/"
+
+# qbittorrent-nox may be starting in parallel with us — wait (up to ~30s) for its
+# WebUI to answer so the very first set_torrent_port can reach the API.
+for _ in $(seq 1 30); do
+    curl -s -o /dev/null --max-time 2 "$QBT_URL" && break
+    sleep 1
+done
+
+get_torrent_port | while read -r port; do
+    set_torrent_port "$port" ||
+        printf '%s: torrent-port-sync: set_torrent_port failed for port %s\n' \
+            "$(date)" "$port" >&2
+done

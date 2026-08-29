@@ -1,49 +1,19 @@
 #!/bin/bash
+#
+# Discover the port forwarded to us by the ProtonVPN gateway (NAT-PMP) and print
+# it to stdout whenever it changes. Nothing else — no firewall, no torrent client.
+#
+# Diagnostics go to stderr, so stdout is a clean stream of port numbers. Renews
+# the 60s NAT-PMP lease every loop; runs until killed.
+#
+# Compose with set_torrent_port to actually apply the port, e.g.:
+#     get_torrent_port | while read -r p; do set_torrent_port "$p"; done
 
-QBT_HOST="http://localhost:8080"
-QBT_USER="admin"
-QBT_PASS=$(cat ~/.config/qbt_pass)
 VPN_GATEWAY="10.2.0.1"
-VPN_IFACE="proton0"
-COOKIE_FILE="/tmp/qbt_cookie.txt"
 
-log() { printf "%s: %s\n" "$(date)" "$*"; }
+log()  { printf "%s: %s\n" "$(date)" "$*" >&2; }
 warn() { printf "%s: WARNING: %s\n" "$(date)" "$*" >&2; }
-err() { printf "%s: ERROR: %s\n" "$(date)" "$*" >&2; }
-
-login_qbt() {
-    curl -sf -c "$COOKIE_FILE" \
-        "$QBT_HOST/api/v2/auth/login" \
-        -d "username=$QBT_USER&password=$QBT_PASS" >/dev/null
-}
-
-update_qbt_port() {
-    local port=$1
-    if ! curl -sf -b "$COOKIE_FILE" \
-        "$QBT_HOST/api/v2/app/setPreferences" \
-        -d "json={\"listen_port\": $port}" >/dev/null; then
-        warn "qBittorrent API call failed — attempting re-login"
-        login_qbt && curl -sf -b "$COOKIE_FILE" \
-            "$QBT_HOST/api/v2/app/setPreferences" \
-            -d "json={\"listen_port\": $port}" >/dev/null
-    fi
-    log "qBittorrent port set to $port"
-}
-
-update_ufw() {
-    local new_port=$1
-    local old_port=$2
-
-    if [ -n "$old_port" ] && [ "$old_port" != "$new_port" ]; then
-        sudo ufw delete allow in on "$VPN_IFACE" to any port "$old_port" proto tcp 2>/dev/null
-        sudo ufw delete allow in on "$VPN_IFACE" to any port "$old_port" proto udp 2>/dev/null
-        log "Removed UFW rules for old port $old_port"
-    fi
-
-    sudo ufw allow in on "$VPN_IFACE" to any port "$new_port" proto tcp
-    sudo ufw allow in on "$VPN_IFACE" to any port "$new_port" proto udp
-    log "Added UFW rules for port $new_port"
-}
+err()  { printf "%s: ERROR: %s\n" "$(date)" "$*" >&2; }
 
 get_mapped_port() {
     local proto=$1
@@ -52,33 +22,28 @@ get_mapped_port() {
         head -1
 }
 
-login_qbt || {
-    err "Initial qBittorrent login failed"
-    exit 1
-}
-
-CURRENT_PORT=""
+LAST_PORT=""
 
 while true; do
     UDP_PORT=$(get_mapped_port udp)
     TCP_PORT=$(get_mapped_port tcp)
 
-    if [ -z "$UDP_PORT" ] || [ -z "$TCP_PORT" ]; then
+    if ! [[ "$UDP_PORT" =~ ^[0-9]+$ ]] || ! [[ "$TCP_PORT" =~ ^[0-9]+$ ]]; then
         err "natpmpc failed or port could not be parsed (udp='$UDP_PORT' tcp='$TCP_PORT')"
-        break
+        sleep 45
+        continue
     fi
 
     if [ "$UDP_PORT" != "$TCP_PORT" ]; then
         warn "UDP port ($UDP_PORT) and TCP port ($TCP_PORT) differ — using UDP port"
     fi
 
-    NEW_PORT="$UDP_PORT"
+    PORT="$UDP_PORT"
 
-    if [ "$NEW_PORT" != "$CURRENT_PORT" ]; then
-        log "Port changed: ${CURRENT_PORT:-<none>} -> $NEW_PORT"
-        update_ufw "$NEW_PORT" "$CURRENT_PORT"
-        update_qbt_port "$NEW_PORT"
-        CURRENT_PORT="$NEW_PORT"
+    if [ "$PORT" != "$LAST_PORT" ]; then
+        log "Port changed: ${LAST_PORT:-<none>} -> $PORT"
+        printf '%s\n' "$PORT"
+        LAST_PORT="$PORT"
     fi
 
     sleep 45
