@@ -40,16 +40,6 @@ if [[ ! -f "$fzf_cache" || "$(command -v fzf)" -nt "$fzf_cache" ]]; then
 fi
 source "$fzf_cache"
 
-# ============================================================================
-# System & Package Management Aliases
-# ============================================================================
-alias un='$aurhelper -Rns'                                  # uninstall package
-alias up='$aurhelper -Syu'                                  # update system/package/aur
-alias pl='$aurhelper -Qs'                                   # list installed package
-alias pa='$aurhelper -Ss'                                   # list available package
-alias pc='$aurhelper -Sc'                                   # remove unused cache
-alias po='$aurhelper -Qtdq | $aurhelper -Rns -'             # remove unused packages
-
 # Interactive yay using fzf
 alias iyay="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
 
@@ -64,7 +54,6 @@ gadd() {
 # File & Directory Aliases
 # ============================================================================
 # Basic commands
-alias c='clear'                                             # clear terminal
 alias cat='bat'                                             # better cat with syntax highlighting
 alias vim='nvim'                                            # use neovim
 
@@ -100,8 +89,6 @@ setbrightness() {
 # ============================================================================
 # Application Aliases
 # ============================================================================
-alias vc='code'                                             # VS Code
-
 # Open apps detached
 vlc() { command vlc "$@" &>/dev/null & disown; }
 mpv() { command mpv "$@" &>/dev/null & disown; }
