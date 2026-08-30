@@ -60,7 +60,7 @@ alias vim='nvim'                                            # use neovim
 # Directory listing (eza)
 alias l='eza -1 --icons=auto'                               # short list
 alias ls='eza -lh --icons=auto'                             # long list
-alias ll='eza -lha --icons=auto --sort=name --group-directories-first' # long list all
+alias la='eza -lha --icons=auto --sort=name --group-directories-first' # long list all
 alias ld='eza -lhD --icons=auto'                            # long list dirs
 alias lt='eza --icons=auto --tree'                          # list folder as tree
 
