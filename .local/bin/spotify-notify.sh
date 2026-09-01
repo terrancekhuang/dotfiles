@@ -21,6 +21,10 @@ ARTIST=$(playerctl -p "$PLAYER" metadata xesam:artist 2>/dev/null)
 ALBUM=$(playerctl -p "$PLAYER" metadata xesam:album 2>/dev/null)
 ART_URL=$(playerctl -p "$PLAYER" metadata mpris:artUrl 2>/dev/null)
 
+TITLE="${TITLE:-Unknown Title}"
+ARTIST="${ARTIST:-Unknown Artist}"
+ALBUM="${ALBUM:-Unknown Album}"
+
 # playerctl gives back a https:// URL for artUrl (Spotify's CDN),
 # so we just download it. If it's a local file:// URL instead,
 # strip the prefix and use it directly.
