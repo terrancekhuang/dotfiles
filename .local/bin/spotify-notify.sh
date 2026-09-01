@@ -28,13 +28,17 @@ ALBUM="${ALBUM:-Unknown Album}"
 # playerctl gives back a https:// URL for artUrl (Spotify's CDN),
 # so we just download it. If it's a local file:// URL instead,
 # strip the prefix and use it directly.
+ICON="spotify" # fallback to the Spotify app icon
 ICON="$ART_CACHE"
 if [[ "$ART_URL" == https://* ]]; then
-    curl -s -o "$ART_CACHE" "$ART_URL"
+    if curl -s -f -o "$ART_CACHE" "$ART_URL"; then
+        ICON="$ART_CACHE"
+    fi
 elif [[ "$ART_URL" == file://* ]]; then
-    ICON="${ART_URL#file://}"
-else
-    ICON="spotify" # fallback to the Spotify app icon
+    LOCAL_PATH="${ART_URL#file://}"
+    if [[ -f "$LOCAL_PATH" ]]; then
+        ICON="$LOCAL_PATH"
+    fi
 fi
 
 BODY="${ALBUM}
