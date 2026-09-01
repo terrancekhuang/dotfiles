@@ -16,10 +16,10 @@ if [[ -z "$STATUS" ]]; then
     exit 0
 fi
 
-TITLE=$(playerctl -p "$PLAYER" metadata xesam:title)
-ARTIST=$(playerctl -p "$PLAYER" metadata xesam:artist)
-ALBUM=$(playerctl -p "$PLAYER" metadata xesam:album)
-ART_URL=$(playerctl -p "$PLAYER" metadata mpris:artUrl)
+TITLE=$(playerctl -p "$PLAYER" metadata xesam:title 2>/dev/null)
+ARTIST=$(playerctl -p "$PLAYER" metadata xesam:artist 2>/dev/null)
+ALBUM=$(playerctl -p "$PLAYER" metadata xesam:album 2>/dev/null)
+ART_URL=$(playerctl -p "$PLAYER" metadata mpris:artUrl 2>/dev/null)
 
 # playerctl gives back a https:// URL for artUrl (Spotify's CDN),
 # so we just download it. If it's a local file:// URL instead,
