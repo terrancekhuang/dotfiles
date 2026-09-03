@@ -18,7 +18,6 @@
     ],
     "modules-right": [
         "idle_inhibitor",
-        "custom/separator",
         "network",
         "bluetooth",
         "custom/separator",
@@ -97,7 +96,7 @@
             "^(kitty|zsh|~)$": "Terminal",
             "(.*) — Mozilla Firefox": "$1",
             "^Mozilla Firefox$": "Firefox",
-            "(.*):(.*)": "$1:$2"
+            "(.*):(.*)": "$1:$2" // Terminal tmux session:window
         }
     },
     "tray": {
