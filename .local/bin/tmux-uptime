@@ -1,0 +1,37 @@
+#!/bin/sh
+# Compact uptime for the tmux status bar.
+#   9h 33m      -> up 9h 33m
+#   2d 0h 5m    -> up 2d 0h
+#   15d 7h 22m  -> up 15d 7h
+#   33m         -> up 33m
+#   40s         -> up 0m
+# At most two units; minutes are dropped once we're counting days.
+
+if [ -r /proc/uptime ]; then
+    # Linux
+    read -r up _ </proc/uptime
+    s=${up%.*}
+else
+    # macOS / BSD
+    boot=$(sysctl -n kern.boottime 2>/dev/null | awk '{print $4}' | tr -d ',')
+    if [ -n "$boot" ]; then
+        s=$(($(date +%s) - boot))
+    else
+        s=0
+    fi
+fi
+
+# Guard against a missing/garbled reading.
+[ "$s" -ge 0 ] 2>/dev/null || s=0
+
+d=$((s / 86400))
+h=$((s / 3600 % 24))
+m=$((s / 60 % 60))
+
+if [ "$d" -gt 0 ]; then
+    printf 'up %dd %dh\n' "$d" "$h"
+elif [ "$h" -gt 0 ]; then
+    printf 'up %dh %dm\n' "$h" "$m"
+else
+    printf 'up %dm\n' "$m"
+fi
