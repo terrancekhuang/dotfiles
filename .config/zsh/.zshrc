@@ -43,12 +43,8 @@ source "$fzf_cache"
 # Interactive yay using fzf
 alias iyay="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
 
-# Interactive git add
-gadd() {
-  git ls-files --modified --others --exclude-standard -z \
-    | fzf -m --read0 --print0 \
-    | xargs -0 git add
-}
+# fzf git add
+alias gaf="git status -s | fzf -m --preview 'git diff --color=always {2}' | awk '{print \$2}' | xargs -r git add"
 
 # ============================================================================
 # File & Directory Aliases
