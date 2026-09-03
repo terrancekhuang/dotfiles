@@ -43,3 +43,41 @@ vim.keymap.set("v", ":s", function()
 end, { expr = true })
 
 vim.api.nvim_create_user_command("W", "SudaWrite", {})
+
+-- gf only grabs up to the first whitespace by default (Vim's 'isfname'
+-- doesn't include space), so paths like "~/foo/bar baz/qux.md" break it.
+-- If the cursor is inside a quoted string or a markdown (...) link, use
+-- that whole span as the path instead; otherwise fall back to plain gf.
+local function smart_gf()
+  local line = vim.api.nvim_get_current_line()
+  local col = vim.api.nvim_win_get_cursor(0)[2] + 1 -- 1-indexed, cursor col
+
+  local function find_span()
+    for _, pat in ipairs({ '"([^"]+)"', "'([^']+)'", "%[.-%]%(([^%)]+)%)" }) do
+      local start_idx = 1
+      while true do
+        local s, e, capture = line:find(pat, start_idx)
+        if not s then
+          break
+        end
+        if col >= s and col <= e then
+          return capture
+        end
+        start_idx = e + 1
+      end
+    end
+  end
+
+  local path = find_span()
+  if path then
+    local expanded = vim.fn.expand(path)
+    if vim.fn.filereadable(expanded) == 1 or vim.fn.isdirectory(expanded) == 1 then
+      vim.cmd("edit " .. vim.fn.fnameescape(expanded))
+      return
+    end
+  end
+
+  vim.cmd("normal! gf")
+end
+
+vim.keymap.set("n", "gf", smart_gf, { desc = "Go to file (handles quoted/linked paths with spaces)" })

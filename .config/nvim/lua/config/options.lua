@@ -30,3 +30,6 @@ vim.opt.ttimeoutlen = 0
 
 -- Scrolling
 vim.opt.scrolloff = 8
+
+-- Let gf/:find search recursively under cwd, not just the current file's dir
+vim.opt.path:append("**")
