@@ -1,16 +1,28 @@
 #!/usr/bin/env bash
 
-required_deps=(soffice magick ebook-convert pandoc weasyprint)
-uninstalled_deps=()
-
-for cmd in "${required_deps[@]}"; do
-    command -v "$cmd" &>/dev/null || uninstalled_deps+=("$cmd")
-done
-
-if [[ ${#uninstalled_deps[@]} -gt 0 ]]; then
-    echo "Dependencies not installed: ${uninstalled_deps[*]}"
+# Check dependencies
+which soffice &>/dev/null || {
+    echo "soffice not found."
     exit 1
-fi
+}
+which magick &>/dev/null || {
+    echo "magick not found."
+    exit 1
+}
+which ebook-convert &>/dev/null || {
+    echo "ebook-convert not found."
+    exit 1
+}
+
+which pandoc &>/dev/null || {
+    echo "pandoc not found."
+    exit 1
+}
+
+which weasyprint &>/dev/null || {
+    echo "weasyprint not found."
+    exit 1
+}
 
 files=("${@:1:$#-1}")
 convert_to="${!#}"
