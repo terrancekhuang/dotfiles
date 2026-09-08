@@ -1,91 +1,118 @@
 #!/usr/bin/env bash
 
-# Check dependencies
-which soffice &>/dev/null || {
-    echo "soffice not found."
-    exit 1
-}
-which magick &>/dev/null || {
-    echo "magick not found."
-    exit 1
-}
-which ebook-convert &>/dev/null || {
-    echo "ebook-convert not found."
-    exit 1
+set -uo pipefail
+
+require_cmd() {
+    which "$1" &>/dev/null || {
+        echo "$1 not found."
+        return 1
+    }
 }
 
-which pandoc &>/dev/null || {
-    echo "pandoc not found."
-    exit 1
-}
-
-which weasyprint &>/dev/null || {
-    echo "weasyprint not found."
+[ "$#" -ge 2 ] || {
+    echo "Usage: $0 file1 [file2 ...] target_format"
     exit 1
 }
 
 files=("${@:1:$#-1}")
 convert_to="${!#}"
+convert_to="${convert_to,,}"
+
+overall_status=0
 
 for convert_from in "${files[@]}"; do
     [ -f "$convert_from" ] || {
         echo "$convert_from not found."
-        exit 1
+        overall_status=1
+        continue
     }
 
     filename="${convert_from%.*}"
     convert_from_extension="${convert_from##*.}"
+    convert_from_extension="${convert_from_extension,,}"
+    outdir="$(dirname "$convert_from")"
 
     case "$convert_to" in
     jpg | png | webp | gif)
         # Image conversion
+        require_cmd magick || {
+            overall_status=1
+            continue
+        }
         echo "Converting $convert_from to $filename.$convert_to"
         magick "$convert_from" "$filename.$convert_to" &&
             echo -e "\tDone." ||
-            echo -e "\tConversion failed."
+            {
+                echo -e "\tConversion failed."
+                overall_status=1
+            }
         ;;
     pdf)
         # Document conversion
         case "$convert_from_extension" in
-        docx | doc | odt)
+        docx | doc | odt | pptx | odp)
+            require_cmd soffice || {
+                overall_status=1
+                continue
+            }
             echo "Converting $convert_from to $filename.pdf"
-            soffice --headless --convert-to pdf "$convert_from" &&
+            soffice --headless --convert-to pdf --outdir "$outdir" "$convert_from" &&
                 echo -e "\tDone." ||
-                echo -e "\tConversion failed."
-            ;;
-        pptx | odp)
-            echo "Converting $convert_from to $filename.pdf"
-            soffice --headless --convert-to pdf "$convert_from" &&
-                echo -e "\tDone." ||
-                echo -e "\tConversion failed."
+                {
+                    echo -e "\tConversion failed."
+                    overall_status=1
+                }
             ;;
         epub)
+            require_cmd ebook-convert || {
+                overall_status=1
+                continue
+            }
             echo "Converting $convert_from to $filename.pdf"
             ebook-convert "$convert_from" "$filename.pdf" &&
                 echo -e "\tDone." ||
-                echo -e "\tConversion failed."
+                {
+                    echo -e "\tConversion failed."
+                    overall_status=1
+                }
             ;;
         md | txt)
+            require_cmd pandoc || {
+                overall_status=1
+                continue
+            }
             echo "Converting $convert_from to $filename.pdf"
             pandoc "$convert_from" -o "$filename.pdf" &&
                 echo -e "\tDone." ||
-                echo -e "\tConversion failed."
+                {
+                    echo -e "\tConversion failed."
+                    overall_status=1
+                }
             ;;
-        html)
+        html | htm)
+            require_cmd weasyprint || {
+                overall_status=1
+                continue
+            }
             echo "Converting $convert_from to $filename.pdf"
             weasyprint "$convert_from" "$filename.pdf" &&
                 echo -e "\tDone." ||
-                echo -e "\tConversion failed."
+                {
+                    echo -e "\tConversion failed."
+                    overall_status=1
+                }
             ;;
         *)
             echo "Unsupported format: $convert_from"
-            exit 1
+            overall_status=1
             ;;
         esac
         ;;
     *)
         echo "Unsupported format: $convert_to"
-        exit 1
+        overall_status=1
         ;;
     esac
 done
+
+exit "$overall_status"
