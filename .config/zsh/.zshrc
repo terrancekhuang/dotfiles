@@ -44,7 +44,13 @@ source "$fzf_cache"
 alias iyay="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
 
 # fzf git add
-alias gaf="git status -s | fzf -m --preview 'git diff --color=always {2}' | awk '{print \$2}' | xargs -r git add"
+gaf() {
+  git status --porcelain=v1 \
+    | fzf -m --preview 'f=$(echo {} | cut -c4- | sed -e "s/^\"//" -e "s/\"$//"); git diff --color=always -- "$f"' \
+    | cut -c4- \
+    | sed -e 's/^"//' -e 's/"$//' \
+    | while IFS= read -r f; do git add -- "$f"; done
+}
 
 # ============================================================================
 # File & Directory Aliases
