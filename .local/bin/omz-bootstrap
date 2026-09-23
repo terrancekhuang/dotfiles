@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Install oh-my-zsh + the custom plugins .zshrc expects. Idempotent.
+set -euo pipefail
+ZSH="${ZSH:-$HOME/.oh-my-zsh}"
+
+[[ -d $ZSH ]] || KEEP_ZSHRC=yes RUNZSH=no CHSH=no sh -c \
+  "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+while read -r name repo; do
+  [[ -d $ZSH/custom/plugins/$name ]] || git clone --depth 1 "https://github.com/$repo" "$ZSH/custom/plugins/$name"
+done <<'PLUGINS'
+zsh-256color chrissicool/zsh-256color
+zsh-autosuggestions zsh-users/zsh-autosuggestions
+zsh-syntax-highlighting zsh-users/zsh-syntax-highlighting
+PLUGINS
