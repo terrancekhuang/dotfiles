@@ -155,7 +155,20 @@
     "clock": {
         "interval": 1,
         "format": "{:%a %b %d  %H:%M:%S}",
-        "tooltip": false
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "mode-mon-col": 3,
+            "on-scroll": 1,
+            "format": {
+                "today": "<span color='#C678DD'><b><u>{}</u></b></span>"
+            }
+        },
+        "actions": {
+            "on-click": "mode",
+            "on-scroll-up": "shift_down",
+            "on-scroll-down": "shift_up"
+        }
     },
     "network": {
         "interface": [
