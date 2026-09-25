@@ -11,6 +11,7 @@ plugins=(git sudo zsh-256color zsh-autosuggestions zsh-syntax-highlighting)
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 [[ -r $ZSH/oh-my-zsh.sh ]] && source "$ZSH/oh-my-zsh.sh"    # must precede bindkey/aliases below
 
+export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/starship.toml"
 command -v starship &>/dev/null && eval "$(starship init zsh)"
 
 setopt INTERACTIVE_COMMENTS
