@@ -31,15 +31,6 @@ bindkey -v
 # Lower key timeout for faster mode switching
 KEYTIMEOUT=1
 
-# Ctrl/Alt-arrow word jumps, Delete key
-bindkey "^[[1;5C" forward-word
-bindkey "^[[1;5D" backward-word
-bindkey "^[[5C" forward-word
-bindkey "^[[5D" backward-word
-bindkey "^[OC" forward-word
-bindkey "^[OD" backward-word
-bindkey "^[[3~" delete-char
-
 # Uncomment to prevent searching for commands not found in package manager
 # unset -f command_not_found_handler
 
