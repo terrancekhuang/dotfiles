@@ -104,34 +104,22 @@ hl.bind(
 	{ repeating = true, description = "[Window Management|Resize Active Window] resize window down" }
 )
 -- Move active window around current workspace with mainMod + Shift + Control [←→↑↓]
-hl.bind(
-	mainMod .. " + SHIFT + CONTROL" .. " + " .. "left",
-	hl.dsp.exec_cmd(
-		"grep -q true <<< $(hyprctl activewindow -j| jq -r.floating) && hyprctl dispatch moveactive -30 0 || hyprctl dispatch movewindow l"
-	),
-	{ repeating = true, description = "Move active window to the left" }
-)
-hl.bind(
-	mainMod .. " + SHIFT + CONTROL" .. " + " .. "right",
-	hl.dsp.exec_cmd(
-		"grep -q true <<< $(hyprctl activewindow -j| jq -r.floating) && hyprctl dispatch moveactive 30 0 || hyprctl dispatch movewindow r"
-	),
-	{ repeating = true, description = "Move active window to the right" }
-)
-hl.bind(
-	mainMod .. " + SHIFT + CONTROL" .. " + " .. "up",
-	hl.dsp.exec_cmd(
-		"grep -q true <<< $(hyprctl activewindow -j| jq -r.floating) && hyprctl dispatch moveactive 0 -30 || hyprctl dispatch movewindow u"
-	),
-	{ repeating = true, description = "Move active window up" }
-)
-hl.bind(
-	mainMod .. " + SHIFT + CONTROL" .. " + " .. "down",
-	hl.dsp.exec_cmd(
-		"grep -q true <<< $(hyprctl activewindow -j| jq -r.floating) && hyprctl dispatch moveactive 0 30 || hyprctl dispatch movewindow d"
-	),
-	{ repeating = true, description = "Move active window down" }
-)
+-- Floating windows are nudged 30px, tiled windows swap places with their neighbour (split sizes stay put)
+for _, m in ipairs({
+	{ key = "left", x = -30, y = 0, desc = "Move active window to the left" },
+	{ key = "right", x = 30, y = 0, desc = "Move active window to the right" },
+	{ key = "up", x = 0, y = -30, desc = "Move active window up" },
+	{ key = "down", x = 0, y = 30, desc = "Move active window down" },
+}) do
+	hl.bind(mainMod .. " + SHIFT + CONTROL + " .. m.key, function()
+		local w = hl.get_active_window()
+		if w ~= nil and w.floating then
+			hl.dispatch(hl.dsp.window.move({ x = m.x, y = m.y, relative = true }))
+		else
+			hl.dispatch(hl.dsp.window.swap({ direction = m.key }))
+		end
+	end, { repeating = true, description = m.desc })
+end
 -- Move/Resize focused window
 hl.bind(
 	mainMod .. " + " .. "mouse:272",
