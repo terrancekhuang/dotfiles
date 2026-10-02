@@ -107,7 +107,7 @@ Macos = " "            # nf-linux-apple
 
 [status]
 style = 'fg:#fb4934'
-format = '[$int$signal_name]($style) '
+format = '[$int( $signal_name)]($style) '
 disabled = false
 
 [directory]
