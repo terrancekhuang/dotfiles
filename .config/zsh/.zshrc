@@ -59,13 +59,17 @@ source "$fzf_cache"
 alias iyay="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
 
 # fzf git add
-gaf() {
-  git status --porcelain=v1 \
-    | fzf -m --preview 'f=$(echo {} | cut -c4- | sed -e "s/^\"//" -e "s/\"$//"); git diff --color=always -- "$f"' \
-    | cut -c4- \
-    | sed -e 's/^"//' -e 's/"$//' \
-    | while IFS= read -r f; do git add -- "$f"; done
-}
+gaf() (
+    root=$(git rev-parse --show-toplevel) || return
+    builtin cd -q "$root" || return  # paths below are root-relative; subshell keeps caller's cwd
+    # unstaged modified/deleted + untracked
+    git ls-files -z --modified --others --exclude-standard --deduplicate |
+        fzf --multi --read0 --print0 --exit-0 \
+            --preview 'git ls-files --error-unmatch -- {} >/dev/null 2>&1 \
+                         && git diff --color=always -- {} \
+                         || git diff --no-index --color=always -- /dev/null {}' |
+        xargs -0 -r git add --
+)
 
 # ============================================================================
 # File & Directory Aliases
