@@ -720,4 +720,11 @@ hl.layer_rule({
 	blur = true,
 })
 
+hl.layer_rule({
+	match = {
+		namespace = "waybar",
+	},
+	blur = true,
+})
+
 -- hyprlang endif

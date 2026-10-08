@@ -1,6 +1,7 @@
 {
     "layer": "top",
     "position": "top",
+    "height": 28,
     "modules-left": [
         "custom/ws1",
         "custom/ws2",
