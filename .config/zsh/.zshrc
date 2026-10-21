@@ -96,7 +96,7 @@ alias .4='cd ../../../..'
 alias .5='cd ../../../../..'
 
 # Safety aliases
-alias rm='rm -i'                                            # don't do anything stupid
+alias rm='rm -I'                                            # don't do anything stupid
 
 # Set brightness
 setbrightness() {
