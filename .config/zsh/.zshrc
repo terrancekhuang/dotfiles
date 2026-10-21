@@ -55,6 +55,8 @@ if [[ ! -f "$fzf_cache" || "$(command -v fzf)" -nt "$fzf_cache" ]]; then
 fi
 source "$fzf_cache"
 
+export FZF_DEFAULT_OPTS="--layout=reverse --bind 'ctrl-a:first,ctrl-e:last'"
+
 # Interactive yay using fzf
 alias iyay="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
 
