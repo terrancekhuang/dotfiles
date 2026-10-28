@@ -24,6 +24,7 @@
         "custom/separator",
         "disk",
         "cpu",
+        "custom/gpu",
         "memory",
         "pulseaudio",
         "custom/separator",
@@ -136,6 +137,12 @@
         "tooltip-format-activated": "Keep Screen On: <span text_transform='capitalize'>{status}</span>",
         "tooltip-format-deactivated": "Keep Screen On: <span text_transform='capitalize'>{status}</span>",
         "start-activated": false
+    },
+    "custom/gpu": {
+        "exec": "~/.config/waybar/scripts/gpu.sh",
+        "return-type": "json",
+        "markup": "pango",
+        "format": "<span color='#56B6C2'>󰢮 </span> {}"
     },
     "cpu": {
         "interval": 1,
