@@ -19,4 +19,5 @@ hl.monitor({
     mode     = "2560x1440@200",
     position = "0x0",
     scale    = 1,
+    cm       = "srgb",
 })
