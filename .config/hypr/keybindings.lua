@@ -449,7 +449,7 @@ hl.bind(
 )
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. "S",
-	hl.dsp.window.move({ workspace = "special" }, { follow = false }),
+	hl.dsp.window.move({ workspace = "special" , follow = false }),
 	{ description = "[Workspaces|Navigation|Special workspace] move to scratchpad (silent)" }
 )
 hl.bind(
@@ -460,52 +460,52 @@ hl.bind(
 -- Move focused window to a workspace silently
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. 1,
-	hl.dsp.window.move({ workspace = 1 }, { follow = false }),
+	hl.dsp.window.move({ workspace = 1 , follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 1 (silent)" }
 )
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. 2,
-	hl.dsp.window.move({ workspace = 2 }, { follow = false }),
+	hl.dsp.window.move({ workspace = 2 , follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 2 (silent)" }
 )
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. 3,
-	hl.dsp.window.move({ workspace = 3 }, { follow = false }),
+	hl.dsp.window.move({ workspace = 3 , follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 3 (silent)" }
 )
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. 4,
-	hl.dsp.window.move({ workspace = 4 }, { follow = false }),
+	hl.dsp.window.move({ workspace = 4 , follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 4 (silent)" }
 )
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. 5,
-	hl.dsp.window.move({ workspace = 5 }, { follow = false }),
+	hl.dsp.window.move({ workspace = 5 , follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 5 (silent)" }
 )
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. 6,
-	hl.dsp.window.move({ workspace = 6 }, { follow = false }),
+	hl.dsp.window.move({ workspace = 6 , follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 6 (silent)" }
 )
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. 7,
-	hl.dsp.window.move({ workspace = 7 }, { follow = false }),
+	hl.dsp.window.move({ workspace = 7 , follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 7 (silent)" }
 )
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. 8,
-	hl.dsp.window.move({ workspace = 8 }, { follow = false }),
+	hl.dsp.window.move({ workspace = 8 , follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 8 (silent)" }
 )
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. 9,
-	hl.dsp.window.move({ workspace = 9 }, { follow = false }),
+	hl.dsp.window.move({ workspace = 9 , follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 9 (silent)" }
 )
 hl.bind(
 	mainMod .. " + ALT" .. " + " .. 0,
-	hl.dsp.window.move({ workspace = 10 }, { follow = false }),
+	hl.dsp.window.move({ workspace = 10 , follow = false }),
 	{ description = "[Workspaces|Navigation|Move window silently] move to workspace 10 (silent)" }
 )
 
