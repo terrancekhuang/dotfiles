@@ -20,6 +20,7 @@
     "modules-right": [
         "idle_inhibitor",
         "network",
+        "custom/vpn",
         "bluetooth",
         "custom/separator",
         "disk",
@@ -179,10 +180,7 @@
         }
     },
     "network": {
-        "interface": [
-            "enp.*",
-            "eth.*"
-        ],
+        "interface": "wlan0",
         "interval": 3,
         "markup": "pango",
         "format-ethernet": "<span color='#61AFEF'>󰈀 </span> up",
@@ -192,6 +190,14 @@
         "format-unknown": "<span color='#61AFEF'>󰈂 </span> up",
         "format-disconnected": "<span color='#E06C75'>󰖪 </span> down",
         "on-click": "nm-connection-editor"
+    },
+    "custom/vpn": {
+        // Shows the VPN interface traffic actually uses; empty output hides the module
+        "exec": "~/.config/waybar/scripts/vpn.sh",
+        "return-type": "json",
+        "interval": 3,
+        "markup": "pango",
+        "format": "<span color='#98C379'>󰖂 </span> {}"
     },
     "bluetooth": {
         "interval": 5,
