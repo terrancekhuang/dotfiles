@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Waybar brightness module for external monitor via DDC/CI
+# Brightness for external monitor via DDC/CI (bound to the XF86MonBrightness keys)
 # Usage: brightness.sh [up|down|get]
 
 STEP=10
-BUS="2" # Your monitor is on /dev/i2c-2
+DDC_DISPLAY="1" # ddcutil display number: i2c bus numbers can change, so do not pin one
 CACHE_FILE="/tmp/brightness_cache"
 LOCK_FILE="/tmp/brightness_cache.lock"
 SLEEP_MULT="0.1"
@@ -17,7 +17,7 @@ get_brightness() {
 
     # Only query monitor if no cache exists at all
     local brightness
-    brightness=$(ddcutil --bus "$BUS" --sleep-multiplier "$SLEEP_MULT" getvcp 10 2>/dev/null |
+    brightness=$(ddcutil --display "$DDC_DISPLAY" --sleep-multiplier "$SLEEP_MULT" getvcp 10 2>/dev/null |
         grep -oP 'current value =\s*\K\d+' || echo "50")
     echo "$brightness" >"$CACHE_FILE"
     echo "$brightness"
@@ -49,7 +49,7 @@ set_brightness() {
     # Fire ddcutil in background — don't wait for it
     (
         flock 9
-        ddcutil --bus "$BUS" --sleep-multiplier "$SLEEP_MULT" setvcp 10 "$new_brightness" 2>/dev/null
+        ddcutil --display "$DDC_DISPLAY" --sleep-multiplier "$SLEEP_MULT" setvcp 10 "$new_brightness" 2>/dev/null
     ) 9>"$LOCK_FILE" &
 
     local icon

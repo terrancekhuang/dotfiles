@@ -255,12 +255,12 @@ hl.bind(
 )
 hl.bind(
 	"XF86MonBrightnessUp",
-	hl.dsp.exec_cmd("~/.config/waybar/scripts/brightness.sh up"),
+	hl.dsp.exec_cmd("~/.local/bin/brightness.sh up"),
 	{ locked = true, repeating = true, description = "[Hardware Controls|Brightness] increase brightness" }
 )
 hl.bind(
 	"XF86MonBrightnessDown",
-	hl.dsp.exec_cmd("~/.config/waybar/scripts/brightness.sh down"),
+	hl.dsp.exec_cmd("~/.local/bin/brightness.sh down"),
 	{ locked = true, repeating = true, description = "[Hardware Controls|Brightness] decrease brightness" }
 )
 hl.bind(
