@@ -1,0 +1,85 @@
+#!/bin/bash
+# pkgclean: clean the pacman and yay package caches
+#   --dry-run  show what would be removed and how much space it would free
+
+set -uo pipefail
+shopt -s nullglob
+
+dry_run=0
+case "${1:-}" in
+    "") ;;
+    --dry-run) dry_run=1 ;;
+    *) echo "usage: pkgclean [--dry-run]" >&2; exit 1 ;;
+esac
+
+if [[ $EUID -eq 0 ]]; then
+    echo "Run pkgclean as your normal user (it uses sudo for pacman)." >&2
+    exit 1
+fi
+
+YAY_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/yay"
+PACMAN_KEEP=2
+pacman_saved=0
+yay_saved=0
+
+# sum the disk usage of the given paths, in bytes
+disk_usage() {
+    (( $# )) || { echo 0; return; }
+    du -sB1 -- "$@" 2>/dev/null | awk '{ total += $1 } END { print total + 0 }'
+}
+
+# ---------- pacman ----------
+echo ":: pacman: removing uninstalled packages, keeping $PACMAN_KEEP versions of the rest"
+# the two passes overlap on uninstalled packages, so count each file once
+mapfile -t candidates < <(
+    { paccache -dvvuk0; paccache -dvvk"$PACMAN_KEEP"; } 2>/dev/null | grep '^/' | sort -u
+)
+pacman_saved=$(disk_usage "${candidates[@]}")
+if (( ${#candidates[@]} && dry_run )); then
+    printf '   %s\n' "${candidates[@]##*/}"
+elif (( ${#candidates[@]} )); then
+    sudo paccache -rvuk0
+    sudo paccache -rvk"$PACMAN_KEEP"
+fi
+
+# ---------- yay ----------
+if [[ -d $YAY_CACHE ]]; then
+    # yay names folders after the pkgbase. Never continue without this list:
+    # an empty one would make every folder look uninstalled.
+    if ! bases=$(pacman -Qqm | xargs -r expac -Q '%e') || [[ -z $bases ]]; then
+        echo "pkgclean: could not list installed AUR packages, leaving the yay cache alone" >&2
+        exit 1
+    fi
+    declare -A installed
+    while read -r base; do
+        [[ -n $base ]] && installed["$base"]=1
+    done <<< "$bases"
+
+    echo ":: yay: removing uninstalled packages and build files (keeping tracked files and .git)"
+    for dir in "$YAY_CACHE"/*/; do
+        dir=${dir%/}
+        base=${dir##*/}
+        if [[ -z ${installed[$base]+x} ]]; then
+            size=$(disk_usage "$dir")
+            echo "   $base (uninstalled)"
+            (( dry_run )) || rm -rf -- "$dir"
+        elif [[ -d $dir/.git ]]; then
+            # without the .git check, git -C would walk up into any enclosing repository
+            mapfile -t files < <(git -c core.quotePath=false -C "$dir" clean -ndffx | sed 's/^Would remove //')
+            (( ${#files[@]} )) || continue
+            size=$(cd "$dir" && disk_usage "${files[@]}")
+            echo "   $base (${#files[@]} items)"
+            (( dry_run )) || git -C "$dir" clean -qdffx
+        else
+            echo "   $base: no .git, skipping" >&2
+            continue
+        fi
+        yay_saved=$(( yay_saved + size ))
+    done
+else
+    echo ":: yay: no cache at $YAY_CACHE, skipping"
+fi
+
+human() { numfmt --to=iec --suffix=B "$1"; }
+(( dry_run )) && verb="would free" || verb="freed"
+echo ":: $verb $(human $(( pacman_saved + yay_saved ))) (pacman $(human "$pacman_saved"), yay $(human "$yay_saved"))"
