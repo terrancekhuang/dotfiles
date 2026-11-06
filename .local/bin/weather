@@ -23,29 +23,38 @@ cache_expired_minutes() {
     [[ ! -f "$1" || -n $(find "$1" -mmin +${2:-30} 2>/dev/null) ]]
 }
 
+# Write to cache only on success, so a failed/404 fetch never poisons it.
+fetch() {
+    local out=$1 tmp
+    shift
+    tmp=$(mktemp "$out.XXXX") && curl -sf "$@" >"$tmp" && [[ -s $tmp ]] && mv "$tmp" "$out" || rm -f "$tmp"
+}
+
 cache_expired() {
     cache_expired_minutes "$1" $((30 * 1440))
 }
 
 # 1. Location (cached 30 days)
 if $no_cache || cache_expired "$location_cache"; then
-    curl -s --max-time 3 ifconfig.co/json >"$location_cache"
+    fetch "$location_cache" --max-time 3 https://ipinfo.io/json
 fi
-IFS=$'\t' read -r latitude longitude < <(jq -r '[.latitude, .longitude] | @tsv' "$location_cache")
+IFS=, read -r latitude longitude < <(jq -r '.loc // empty' "$location_cache" 2>/dev/null)
+[[ -n $latitude && -n $longitude ]] || { echo "weather: can't determine location" >&2; exit 1; }
 
 # 2. Points (cached 30 days)
 if $no_cache || cache_expired "$points_cache"; then
-    curl -s --max-time 5 "$root/points/$latitude,$longitude" -H "$header" >"$points_cache"
+    fetch "$points_cache" --max-time 5 "$root/points/$latitude,$longitude" -H "$header"
 fi
 IFS=$'\t' read -r obsStationsUrl forecastUrl < <(jq -r '
     [.properties.observationStations, (.properties.forecast + "?units=si")] | @tsv
-' "$points_cache")
+' "$points_cache" 2>/dev/null)
+[[ -n $obsStationsUrl ]] || { echo "weather: NWS points lookup failed" >&2; exit 1; }
 
 # 3. Forecast (cached 30 min)
 tmp_stations=$(mktemp)
 
 if $no_cache || cache_expired_minutes "$forecast_cache" 30; then
-    curl -s --max-time 10 "$forecastUrl" -H "$header" >"$forecast_cache" &
+    fetch "$forecast_cache" --max-time 10 "$forecastUrl" -H "$header" &
 fi
 curl -s --max-time 10 "$obsStationsUrl" -H "$header" >"$tmp_stations" &
 wait
@@ -53,7 +62,7 @@ wait
 # 4. Observation (cached 10 min)
 stationId=$(jq -r '.features[0].properties.stationIdentifier' "$tmp_stations")
 if $no_cache || cache_expired_minutes "$obs_cache" 10; then
-    curl -s --max-time 10 -H "$header" "$root/stations/$stationId/observations/latest" >"$obs_cache"
+    fetch "$obs_cache" --max-time 10 -H "$header" "$root/stations/$stationId/observations/latest"
 fi
 
 # NWS sometimes nulls a QC-flagged field even though the raw METAR still
