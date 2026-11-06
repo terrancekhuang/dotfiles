@@ -110,8 +110,17 @@ if $verbose; then
     IFS=$'\t' read -r place grid < <(jq -r '.properties
         | [(.relativeLocation.properties | "\(.city), \(.state)"), "\(.gridId) \(.gridX),\(.gridY)"] | @tsv' "$points_cache")
     IFS=$'\t' read -r stationName obsTime < <(jq -r '.properties | [.stationName, .timestamp] | @tsv' "$obs_cache")
+    # Great-circle (haversine) distance from our point to the station.
+    stationDist=$(jq -r --argjson la "$latitude" --argjson lo "$longitude" '
+        def rad: . * 3.141592653589793 / 180;
+        .features[0].geometry.coordinates as [$x, $y]
+        | (($y - $la) | rad) as $dy | (($x - $lo) | rad) as $dx
+        | (($dy / 2 | sin) * ($dy / 2 | sin)
+           + ($la | rad | cos) * ($y | rad | cos) * ($dx / 2 | sin) * ($dx / 2 | sin)) as $h
+        | 6371 * 2 * ($h | sqrt | asin) | . * 10 | round / 10
+    ' "$tmp_stations" 2>/dev/null)
     printf 'Location: %s (%s,%s) via %s\n' "$place" "$latitude" "$longitude" "$source"
-    printf 'Station:  %s %s\n' "$stationId" "$stationName"
+    printf 'Station:  %s %s%s\n' "$stationId" "$stationName" "${stationDist:+ ($stationDist km away)}"
     printf 'Observed: %s\n' "$(date -d "$obsTime" '+%a %b %-d, %-I:%M %p %Z' 2>/dev/null || echo "$obsTime")"
     printf 'Forecast: NWS grid %s\n\n' "$grid"
 fi
