@@ -5,13 +5,15 @@ header="Accept: application/geo+json"
 cache_dir="$HOME/.cache/weather"
 location_cache="$cache_dir/location.json"
 no_cache=false
+verbose=false
 zip=
 
-usage() { echo "usage: weather [--no-cache] [--zip ZIP]" >&2; exit 2; }
+usage() { echo "usage: weather [-v|--verbose] [--no-cache] [-z|--zip ZIP]" >&2; exit 2; }
 
 while (($#)); do
     case $1 in
     --no-cache) no_cache=true ;;
+    -v | --verbose) verbose=true ;;
     -z | --zip) [[ -n $2 ]] || usage; zip=$2; shift ;;
     --zip=*) zip=${1#*=} ;;
     *) usage ;;
@@ -42,6 +44,7 @@ cache_expired() {
 if [[ -n $zip ]]; then
     [[ $zip =~ ^([0-9]{5})(-[0-9]{4})?$ ]] || { echo "weather: --zip must be a 5-digit US ZIP code" >&2; exit 2; }
     zip=${BASH_REMATCH[1]}
+    source="ZIP $zip"
     zip_cache="$cache_dir/zip-$zip.json"
     if $no_cache || cache_expired "$zip_cache"; then
         fetch "$zip_cache" --max-time 5 "https://api.zippopotam.us/us/$zip"
@@ -49,6 +52,7 @@ if [[ -n $zip ]]; then
     IFS=$'\t' read -r latitude longitude < <(jq -r '.places[0] | [.latitude, .longitude] | @tsv' "$zip_cache" 2>/dev/null)
     [[ -n $latitude && -n $longitude ]] || { echo "weather: can't look up ZIP $zip (unknown ZIP or zippopotam.us unreachable)" >&2; exit 1; }
 else
+    source="IP"
     if $no_cache || cache_expired "$location_cache"; then
         fetch "$location_cache" --max-time 3 https://ipinfo.io/json
     fi
@@ -101,6 +105,16 @@ obsLatest=$(jq -r '
     ) // "null"
 ' "$obs_cache")
 forecastDescription=$(jq -r '.properties.periods[0].detailedForecast' "$forecast_cache")
+
+if $verbose; then
+    IFS=$'\t' read -r place grid < <(jq -r '.properties
+        | [(.relativeLocation.properties | "\(.city), \(.state)"), "\(.gridId) \(.gridX),\(.gridY)"] | @tsv' "$points_cache")
+    IFS=$'\t' read -r stationName obsTime < <(jq -r '.properties | [.stationName, .timestamp] | @tsv' "$obs_cache")
+    printf 'Location: %s (%s,%s) via %s\n' "$place" "$latitude" "$longitude" "$source"
+    printf 'Station:  %s %s\n' "$stationId" "$stationName"
+    printf 'Observed: %s\n' "$(date -d "$obsTime" '+%a %b %-d, %-I:%M %p %Z' 2>/dev/null || echo "$obsTime")"
+    printf 'Forecast: NWS grid %s\n\n' "$grid"
+fi
 
 printf "%s°C\n" "$obsLatest" | fmt -w 80
 printf "%s\n" "$forecastDescription" | fmt -w 80
