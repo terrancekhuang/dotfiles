@@ -22,6 +22,12 @@
 -- idle_inhibit rules
 
 hl.window_rule({
+	name = "f1multiviewer-float",
+	match = { class = "^(multiviewer)$" },
+	float = true,
+})
+
+hl.window_rule({
 	name = "media_players_idle_inhibit",
 	match = {
 		class = "^(.*celluloid.*)$|^(.*mpv.*)$|^(.*vlc.*)$",
