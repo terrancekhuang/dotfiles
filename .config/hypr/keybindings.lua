@@ -300,7 +300,7 @@ hl.bind(
 )
 hl.bind(
 	"Print",
-	hl.dsp.exec_cmd("flameshot gui --region all"),
+	hl.dsp.exec_cmd("flameshot screen --edit"),
 	{ locked = true, description = "[Utilities|Screen Capture] screenshot whole monitor into editor" }
 )
 hl.bind(
