@@ -194,7 +194,7 @@
         "return-type": "json",
         "interval": 3,
         "markup": "pango",
-        "format": "<span color='#98C379'>󰖂 </span> {}"
+        "format": "<span color='#98C379'>󰖂</span>"
     },
     "bluetooth": {
         "interval": 5,
