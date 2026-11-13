@@ -145,12 +145,12 @@
     "cpu": {
         "interval": 1,
         "markup": "pango",
-        "format": "<span color='#E06C75'></span> {usage:>2}%"
+        "format": "<span color='#E06C75'>󰻠</span> {usage:>2}%"
     },
     "memory": {
         "interval": 2,
         "markup": "pango",
-        "format": "<span color='#98C379'></span> {percentage:>2}%"
+        "format": "<span color='#98C379'>󰘚</span> {percentage:>2}%"
     },
     "disk": {
         "interval": 30,
