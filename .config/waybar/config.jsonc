@@ -199,10 +199,12 @@
     "bluetooth": {
         "interval": 5,
         "markup": "pango",
-        "format": "<span color='#5C6370'>󰂯 </span>disconnected",
-        "format-off": "<span color='#5C6370'>󰂯 </span>power off",
-        "format-no-controller": "<span color='#5C6370'>󰂯 </span>disabled",
-        "format-connected": "<span color='#61AFEF'>󰂯 </span>connected",
+        "format": "<span color='#ABB2BF'>󰂯</span>",
+        "format-off": "<span color='#ffffff'>󰂲</span>",
+        "format-no-controller": "<span color='#ffffff'>󰂲</span>",
+        "format-connected": "<span color='#61AFEF'>󰂱</span>",
+        "tooltip-format": "Bluetooth: {status}",
+        "tooltip-format-connected": "Bluetooth: {device_alias}",
         "on-click": "blueman-manager"
     }
 }
