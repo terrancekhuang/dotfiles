@@ -18,7 +18,7 @@
         "hyprland/window"
     ],
     "modules-right": [
-        "idle_inhibitor",
+        "custom/keepawake",
         "network",
         "custom/vpn",
         "bluetooth",
@@ -127,17 +127,14 @@
         "markup": "pango",
         "interval": 3600
     },
-    "idle_inhibitor": {
-        "format": "{icon}",
-        "format-icons": {
-            "activated": "󰈈",
-            "deactivated": "󰈉"
-        },
+    "custom/keepawake": {
+        "exec": "~/.config/waybar/scripts/keepawake.sh status",
+        "return-type": "json",
+        "interval": 10,
+        "signal": 8,
+        "on-click": "~/.config/waybar/scripts/keepawake.sh",
         "min-length": 3,
-        "max-length": 3,
-        "tooltip-format-activated": "Keep Screen On: <span text_transform='capitalize'>{status}</span>",
-        "tooltip-format-deactivated": "Keep Screen On: <span text_transform='capitalize'>{status}</span>",
-        "start-activated": false
+        "max-length": 3
     },
     "custom/gpu": {
         "exec": "~/.config/waybar/scripts/gpu.sh",

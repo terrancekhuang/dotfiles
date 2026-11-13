@@ -57,7 +57,8 @@
 #custom-right_inv.1 {
 	color: @time;
 }
-#idle_inhibitor {
+#idle_inhibitor,
+#custom-keepawake {
 	background-color: @time;
 }
 #clock.time {
