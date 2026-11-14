@@ -180,12 +180,12 @@
         "interface": "wlan0",
         "interval": 3,
         "markup": "pango",
-        "format-ethernet": "<span color='#61AFEF'>󰈀 </span> up",
-        "format-wifi": "<span color='#61AFEF'>󰖩 </span>",
+        "format-ethernet": "<span color='#61AFEF'>󰈀</span> up",
+        "format-wifi": "<span color='#61AFEF'>󰖩</span>",
         "tooltip-format": "{ifname} {ipaddr}/{cidr}\nGateway: {gwaddr}\n↓{bandwidthDownBytes} ↑{bandwidthUpBytes}",
         "tooltip-format-wifi": "{essid} ({signalStrength}%, {frequency} GHz)\n{ifname} {ipaddr}/{cidr}\n↓{bandwidthDownBytes} ↑{bandwidthUpBytes}",
-        "format-unknown": "<span color='#61AFEF'>󰈂 </span> up",
-        "format-disconnected": "<span color='#E06C75'>󰖪 </span> down",
+        "format-unknown": "<span color='#61AFEF'>󰈂</span> up",
+        "format-disconnected": "<span color='#E06C75'>󰖪</span> down",
         "on-click": "nm-connection-editor"
     },
     "custom/vpn": {
