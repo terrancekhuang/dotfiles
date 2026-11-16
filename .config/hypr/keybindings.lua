@@ -514,3 +514,15 @@ hl.bind(
 	hl.dsp.exec_cmd("~/.local/bin/spotify-notify.sh"),
 	{ description = "[Media|Spotify] show now-playing notification" }
 )
+
+-- Override HyDE alt-tab release binds: HyDE's Lua port dropped the `n` flag,
+-- so they swallowed Alt and apps/games never saw it.
+for _, key in ipairs({ "ALT_L", "ALT_R" }) do
+	hl.unbind("ALT + " .. key)
+	hl.bind("ALT + " .. key, hl.dsp.exec_cmd(hyde.sh.altab("--apply")), {
+		description = "[Window Management|alt-tab window switcher] switch",
+		release = true,
+		transparent = true,
+		non_consuming = true,
+	})
+end
