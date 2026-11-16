@@ -1,0 +1,6 @@
+#!/bin/sh
+# Usage: setwall <image>  — points ~/.local/state/wallpaper at it (outside git) and applies it live.
+[ -f "$1" ] || { echo "usage: setwall <image>" >&2; exit 1; }
+img=$(realpath "$1")
+ln -sfn "$img" ~/.local/state/wallpaper
+hyprctl hyprpaper wallpaper "DP-1,$img"
