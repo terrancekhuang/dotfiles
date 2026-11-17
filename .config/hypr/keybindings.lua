@@ -28,7 +28,7 @@ hl.bind(
 )
 hl.bind(
 	mainMod .. " + " .. "L",
-	hl.dsp.exec_cmd("$HOME/.local/lib/hyde/lockscreen.sh"),
+	hl.dsp.exec_cmd("loginctl lock-session"),
 	{ description = "[Window Management] lock screen" }
 )
 hl.bind(
